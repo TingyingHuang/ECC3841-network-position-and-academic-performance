@@ -1,0 +1,29 @@
+LAYER 3: high_school subsample -- gpa ~ katz_z + avg_friend_gpa
+SEs clustered by student.
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                    gpa   R-squared:                       0.095
+Model:                            OLS   Adj. R-squared:                  0.094
+Method:                 Least Squares   F-statistic:                     60.26
+Date:                Wed, 02 Sep 2026   Prob (F-statistic):           2.20e-24
+Time:                        00:33:37   Log-Likelihood:                -1975.6
+No. Observations:                2532   AIC:                             3957.
+Df Residuals:                    2529   BIC:                             3975.
+Df Model:                           2                                         
+Covariance Type:              cluster                                         
+==================================================================================
+                     coef    std err          z      P>|z|      [0.025      0.975]
+----------------------------------------------------------------------------------
+Intercept          2.1004      0.163     12.903      0.000       1.781       2.419
+katz_z             0.0172      0.021      0.824      0.410      -0.024       0.058
+avg_friend_gpa     0.4543      0.042     10.946      0.000       0.373       0.536
+==============================================================================
+Omnibus:                      133.947   Durbin-Watson:                   1.834
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               64.287
+Skew:                           0.194   Prob(JB):                     1.10e-14
+Kurtosis:                       2.322   Cond. No.                         43.8
+==============================================================================
+
+Notes:
+[1] Standard Errors are robust to cluster correlation (CRV1)

@@ -1,0 +1,37 @@
+gpa ~ katz_centrality_z + eigenvector_z + betweenness_z + in_degree_z + out_degree_z + avg_friend_gpa + C(group)
+SEs clustered by student.
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                    gpa   R-squared:                       0.447
+Model:                            OLS   Adj. R-squared:                  0.447
+Method:                 Least Squares   F-statistic:                     1735.
+Date:                Wed, 02 Sep 2026   Prob (F-statistic):               0.00
+Time:                        00:34:18   Log-Likelihood:                -54196.
+No. Observations:               36696   AIC:                         1.084e+05
+Df Residuals:                   36685   BIC:                         1.085e+05
+Df Model:                          10                                         
+Covariance Type:              cluster                                         
+==========================================================================================
+                             coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------------------
+Intercept                  3.8225      0.132     28.989      0.000       3.564       4.081
+C(group)[T.juniors]       -0.1024      0.040     -2.569      0.010      -0.181      -0.024
+C(group)[T.school]        -1.7989      0.071    -25.427      0.000      -1.938      -1.660
+C(group)[T.seniors]        0.0300      0.041      0.739      0.460      -0.050       0.110
+C(group)[T.sophomores]    -0.1805      0.037     -4.824      0.000      -0.254      -0.107
+katz_centrality_z         -0.0280      0.037     -0.762      0.446      -0.100       0.044
+eigenvector_z             -0.0127      0.019     -0.673      0.501      -0.050       0.024
+betweenness_z             -0.0593      0.017     -3.512      0.000      -0.092      -0.026
+in_degree_z                0.1533      0.025      6.216      0.000       0.105       0.202
+out_degree_z               0.0848      0.016      5.399      0.000       0.054       0.116
+avg_friend_gpa             0.4739      0.017     27.649      0.000       0.440       0.508
+==============================================================================
+Omnibus:                      348.890   Durbin-Watson:                   1.913
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              358.785
+Skew:                          -0.242   Prob(JB):                     1.23e-78
+Kurtosis:                       3.007   Cond. No.                         96.5
+==============================================================================
+
+Notes:
+[1] Standard Errors are robust to cluster correlation (CRV1)

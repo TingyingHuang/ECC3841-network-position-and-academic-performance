@@ -1,0 +1,476 @@
+<title>Popularity vs. Reach</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #faf9f6;
+    --surface-2:      #f1efe8;
+    --border:         #ddd8cd;
+    --text-primary:   #19180f;
+    --text-secondary: #55503f;
+    --text-muted:     #918c7a;
+    --series-corr:    #2a78d6;
+    --series-corr-fill: rgba(42,120,214,0.10);
+    --series-coef:    #eb6834;
+    --series-coef-fill: rgba(235,104,52,0.14);
+    --sig-fill:       #eb6834;
+    --grid:           #e4dfd3;
+    --zero-line:      #b8b2a1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #171613;
+      --surface-2:      #201f1a;
+      --border:         #38352c;
+      --text-primary:   #f7f5ef;
+      --text-secondary: #c4bfb0;
+      --text-muted:     #8b8676;
+      --series-corr:    #3987e5;
+      --series-corr-fill: rgba(57,135,229,0.14);
+      --series-coef:    #d95926;
+      --series-coef-fill: rgba(217,89,38,0.18);
+      --sig-fill:       #d95926;
+      --grid:           #2c2a23;
+      --zero-line:      #4a4638;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #171613;
+    --surface-2:      #201f1a;
+    --border:         #38352c;
+    --text-primary:   #f7f5ef;
+    --text-secondary: #c4bfb0;
+    --text-muted:     #8b8676;
+    --series-corr:    #3987e5;
+    --series-corr-fill: rgba(57,135,229,0.14);
+    --series-coef:    #d95926;
+    --series-coef-fill: rgba(217,89,38,0.18);
+    --sig-fill:       #d95926;
+    --grid:           #2c2a23;
+    --zero-line:      #4a4638;
+  }
+
+  * { box-sizing: border-box; }
+  .viz-root {
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-family: "Libre Franklin", system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 56px;
+    display: flex;
+    justify-content: center;
+  }
+  .page { width: 100%; max-width: 760px; }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-family: "Libre Franklin", sans-serif;
+    font-weight: 900;
+    font-size: clamp(24px, 4vw, 32px);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+    text-wrap: balance;
+    max-width: 30ch;
+  }
+  .dek {
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    max-width: 62ch;
+    margin: 0 0 32px;
+  }
+  .dek b { color: var(--text-primary); font-weight: 600; }
+
+  .chart-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 22px 10px;
+  }
+  .panel-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 2px;
+  }
+  .panel-sub {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    color: var(--text-muted);
+    margin: 0 0 6px;
+  }
+
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .gridline { stroke: var(--grid); stroke-width: 1; }
+  .zero-line { stroke: var(--zero-line); stroke-width: 1; stroke-dasharray: 3 3; }
+  .axis-text {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    fill: var(--text-muted);
+  }
+  .axis-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    fill: var(--text-muted);
+    letter-spacing: 0.03em;
+  }
+  .line-corr { fill: none; stroke: var(--series-corr); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .area-corr { fill: var(--series-corr-fill); }
+  .line-coef { fill: none; stroke: var(--series-coef); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .ci-band { fill: var(--series-coef-fill); }
+  .dot-sig { fill: var(--sig-fill); stroke: var(--surface-2); stroke-width: 2; }
+  .dot-nonsig { fill: var(--surface-2); stroke: var(--series-coef); stroke-width: 2; }
+  .dot-corr { fill: var(--series-corr); stroke: var(--surface-2); stroke-width: 2; }
+  .direct-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+  }
+
+  .hover-line { stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0; pointer-events: none; }
+  .hit { fill: transparent; cursor: crosshair; }
+
+  .tooltip {
+    position: absolute;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.08s ease;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    white-space: nowrap;
+    z-index: 5;
+  }
+  .tooltip .t-title { color: var(--text-muted); margin-bottom: 3px; }
+  .tooltip .t-row b { font-weight: 500; }
+
+  .legend {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    padding: 14px 4px 16px;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; }
+  .swatch { width: 14px; height: 3px; border-radius: 2px; flex: none; }
+  .swatch.dot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--series-coef); background: var(--surface-2); }
+  .swatch.dot.filled { background: var(--sig-fill); }
+
+  .caption {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+  .caption b { color: var(--text-primary); font-weight: 600; }
+
+  table.datatable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 28px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+  }
+  .datatable-wrap { overflow-x: auto; }
+  table.datatable caption {
+    text-align: left;
+    font-family: "Libre Franklin", sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  table.datatable th, table.datatable td {
+    text-align: right;
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  table.datatable th:first-child, table.datatable td:first-child { text-align: left; }
+  table.datatable th {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  table.datatable td { color: var(--text-primary); }
+  table.datatable td.sig { color: var(--series-coef); font-weight: 500; }
+
+  footer {
+    margin-top: 30px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tooltip { transition: none; }
+  }
+</style>
+
+<div class="viz-root">
+<div class="page">
+
+  <p class="eyebrow">ECC3841 · Network Economics — Robustness Check</p>
+  <h1>Katz&#8211;Bonacich centrality only diverges from raw popularity at high decay &#8212; and there, its independent effect on GPA turns negative</h1>
+  <p class="dek">
+    Sweeping the attenuation parameter &alpha; of Katz-Bonacich centrality from
+    near-zero (&alpha; &asymp; 0, equivalent to raw in-degree) up toward its
+    theoretical convergence bound (&alpha; &asymp; 1/&lambda;<sub>max</sub>) shows
+    <b>where</b> the measure stops being a relabeled popularity count &#8212; and
+    that once it does, <b>indirect network reach predicts lower GPA</b>, holding
+    popularity fixed.
+  </p>
+
+  <div class="chart-card">
+    <p class="panel-label">Correlation with raw in-degree</p>
+    <p class="panel-sub">avg. across 38 network snapshots, by decay level</p>
+    <svg id="chart-corr" viewBox="0 0 680 190" role="img" aria-label="Line chart: correlation between Katz-Bonacich centrality and in-degree falls from 0.9999 at alpha=0.05 to 0.753 at alpha=0.95"></svg>
+
+    <p class="panel-label" style="margin-top:6px;">Katz coefficient in horse race vs. in/out-degree</p>
+    <p class="panel-sub">standardized OLS coefficient on GPA, 95% CI, clustered by student</p>
+    <svg id="chart-coef" viewBox="0 0 680 220" role="img" aria-label="Line chart: Katz-Bonacich coefficient on GPA starts positive and significant at alpha=0.05 (an artifact of near-identity with degree), turns insignificant in the middle range, then becomes significantly negative at alpha=0.80 and 0.95"></svg>
+
+    <div class="legend">
+      <div class="legend-item"><span class="swatch" style="background:var(--series-corr)"></span> corr(Katz, in-degree)</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--series-coef)"></span> Katz coefficient (95% CI)</div>
+      <div class="legend-item"><span class="swatch dot filled"></span> p &lt; 0.05</div>
+      <div class="legend-item"><span class="swatch dot"></span> not significant</div>
+    </div>
+  </div>
+
+  <p class="caption">
+    At low &alpha;, Katz-Bonacich is numerically almost identical to in-degree
+    (r = 0.9999) &#8212; so its apparent significance there (&alpha;=0.05, p=0.012)
+    is just degree's own signal passing through a near-duplicate variable. Only
+    once &alpha; approaches its theoretical ceiling does the measure genuinely
+    capture multi-step, indirect reach through the network (r drops to 0.75) &#8212;
+    and <b>that</b> is where an independent, robustly negative effect on GPA
+    emerges (&alpha;=0.80: &minus;0.048, p=0.031; &alpha;=0.95: &minus;0.036, p=0.011).
+    Betweenness centrality, a structurally distinct "bridge" measure, shows the
+    same negative sign in the full horse race (&minus;0.059, p&lt;0.001).
+  </p>
+
+  <div class="datatable-wrap">
+  <table class="datatable">
+    <caption>Full sweep values (pooled across all 5 cohorts, student-clustered SEs)</caption>
+    <thead>
+      <tr><th>&alpha; (frac. of max)</th><th>corr(Katz, in-deg)</th><th>Katz coef.</th><th>SE</th><th>p-value</th><th>R&sup2;</th></tr>
+    </thead>
+    <tbody id="data-table-body"></tbody>
+  </table>
+  </div>
+
+  <footer>
+    Source: Smirnov &amp; Thurner (2017) replication data, Harvard Dataverse
+    doi:10.7910/DVN/SZA9YW &middot; n = 5 cohorts (1 high school + 4 university
+    class-years), 38 network snapshots &middot; OLS, standard errors clustered by
+    student &middot; &alpha;<sub>max</sub> = 1/&lambda;<sub>max</sub> of each
+    snapshot's adjacency matrix, sampled at 0.85&times;&alpha;<sub>max</sub> in
+    the baseline specification.
+  </footer>
+
+</div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+(function () {
+  const data = [
+    { alpha: 0.05, corr: 0.999864, coef: 0.082013, se: 0.032761, p: 0.012301, r2: 0.419268 },
+    { alpha: 0.20, corr: 0.997581, coef: 0.021605, se: 0.040968, p: 0.597942, r2: 0.419227 },
+    { alpha: 0.40, corr: 0.988360, coef: -0.034450, se: 0.041517, p: 0.406669, r2: 0.419242 },
+    { alpha: 0.60, corr: 0.965702, coef: -0.051312, se: 0.032543, p: 0.114851, r2: 0.419315 },
+    { alpha: 0.80, corr: 0.905302, coef: -0.047724, se: 0.022116, p: 0.030935, r2: 0.419413 },
+    { alpha: 0.95, corr: 0.752992, coef: -0.035579, se: 0.013928, p: 0.010634, r2: 0.419469 },
+  ];
+  data.forEach(d => { d.lo = d.coef - 1.96 * d.se; d.hi = d.coef + 1.96 * d.se; d.sig = d.p < 0.05; });
+
+  const tooltip = document.getElementById('tooltip');
+  const fmt = (v, digits) => v.toFixed(digits);
+
+  // ---------- shared x scale ----------
+  const xMin = 0, xMax = 1;
+  const padL = 46, padR = 16;
+
+  function xScale(alpha, width) {
+    return padL + (alpha - xMin) / (xMax - xMin) * (width - padL - padR);
+  }
+
+  // ================= CHART 1: correlation =================
+  (function () {
+    const svg = document.getElementById('chart-corr');
+    const W = 680, H = 190;
+    const padT = 10, padB = 30;
+    const yMin = 0.70, yMax = 1.02;
+    const plotH = H - padT - padB;
+
+    function yScale(v) { return padT + (yMax - v) / (yMax - yMin) * plotH; }
+
+    let s = '';
+    // gridlines
+    [0.75, 0.85, 0.95, 1.0].forEach(v => {
+      const y = yScale(v);
+      s += `<line class="gridline" x1="${padL}" x2="${W - padR}" y1="${y}" y2="${y}"/>`;
+      s += `<text class="axis-text" x="${padL - 8}" y="${y + 3}" text-anchor="end">${v.toFixed(2)}</text>`;
+    });
+    // x axis ticks
+    data.forEach(d => {
+      const x = xScale(d.alpha, W);
+      s += `<text class="axis-text" x="${x}" y="${H - padB + 16}" text-anchor="middle">${d.alpha.toFixed(2)}</text>`;
+    });
+    s += `<text class="axis-title" x="${W - padR}" y="${H - 2}" text-anchor="end">&alpha; (fraction of theoretical max)</text>`;
+
+    // area under line
+    let areaPath = `M ${xScale(data[0].alpha, W)} ${yScale(yMin)} `;
+    data.forEach(d => { areaPath += `L ${xScale(d.alpha, W)} ${yScale(d.corr)} `; });
+    areaPath += `L ${xScale(data[data.length - 1].alpha, W)} ${yScale(yMin)} Z`;
+    s += `<path class="area-corr" d="${areaPath}"/>`;
+
+    // line
+    let linePath = data.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.alpha, W)} ${yScale(d.corr)}`).join(' ');
+    s += `<path class="line-corr" d="${linePath}"/>`;
+
+    // dots + direct label on last point
+    data.forEach((d, i) => {
+      const x = xScale(d.alpha, W), y = yScale(d.corr);
+      s += `<circle class="dot-corr" cx="${x}" cy="${y}" r="4"/>`;
+      if (i === data.length - 1) {
+        s += `<text class="direct-label" x="${x - 10}" y="${y - 12}" text-anchor="end" fill="var(--series-corr)">${d.corr.toFixed(3)}</text>`;
+      }
+      if (i === 0) {
+        s += `<text class="direct-label" x="${x + 10}" y="${y - 10}" text-anchor="start" fill="var(--series-corr)">${d.corr.toFixed(4)}</text>`;
+      }
+    });
+
+    // hover
+    s += `<line class="hover-line" id="hover-corr" x1="0" x2="0" y1="${padT}" y2="${H - padB}"/>`;
+    s += `<rect class="hit" x="${padL}" y="${padT}" width="${W - padL - padR}" height="${plotH}" id="hit-corr"/>`;
+
+    svg.innerHTML = s;
+
+    const hit = document.getElementById('hit-corr');
+    const hoverLine = document.getElementById('hover-corr');
+    hit.addEventListener('mousemove', (e) => {
+      const rect = svg.getBoundingClientRect();
+      const scaleX = W / rect.width;
+      const mx = (e.clientX - rect.left) * scaleX;
+      let nearest = data[0], nd = Infinity;
+      data.forEach(d => { const dx = Math.abs(xScale(d.alpha, W) - mx); if (dx < nd) { nd = dx; nearest = d; } });
+      const x = xScale(nearest.alpha, W);
+      hoverLine.setAttribute('x1', x); hoverLine.setAttribute('x2', x); hoverLine.style.opacity = 1;
+      tooltip.innerHTML = `<div class="t-title">&alpha; = ${nearest.alpha.toFixed(2)} &times; max</div>
+        <div class="t-row">corr(Katz, in-deg): <b>${nearest.corr.toFixed(4)}</b></div>`;
+      tooltip.style.opacity = 1;
+      const svgRect = svg.getBoundingClientRect();
+      tooltip.style.left = (e.clientX - svgRect.left + svgRect.left + 14) + 'px';
+      tooltip.style.top = (e.clientY - 10) + 'px';
+    });
+    hit.addEventListener('mouseleave', () => { hoverLine.style.opacity = 0; tooltip.style.opacity = 0; });
+  })();
+
+  // ================= CHART 2: coefficient =================
+  (function () {
+    const svg = document.getElementById('chart-coef');
+    const W = 680, H = 220;
+    const padT = 10, padB = 30;
+    const yMin = -0.14, yMax = 0.16;
+    const plotH = H - padT - padB;
+
+    function yScale(v) { return padT + (yMax - v) / (yMax - yMin) * plotH; }
+
+    let s = '';
+    [-0.10, -0.05, 0, 0.05, 0.10, 0.15].forEach(v => {
+      const y = yScale(v);
+      s += `<line class="gridline" x1="${padL}" x2="${W - padR}" y1="${y}" y2="${y}"/>`;
+      s += `<text class="axis-text" x="${padL - 8}" y="${y + 3}" text-anchor="end">${v.toFixed(2)}</text>`;
+    });
+    // zero line emphasized
+    s += `<line class="zero-line" x1="${padL}" x2="${W - padR}" y1="${yScale(0)}" y2="${yScale(0)}"/>`;
+
+    data.forEach(d => {
+      const x = xScale(d.alpha, W);
+      s += `<text class="axis-text" x="${x}" y="${H - padB + 16}" text-anchor="middle">${d.alpha.toFixed(2)}</text>`;
+    });
+    s += `<text class="axis-title" x="${W - padR}" y="${H - 2}" text-anchor="end">&alpha; (fraction of theoretical max)</text>`;
+
+    // CI band
+    let bandTop = data.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.alpha, W)} ${yScale(d.hi)}`).join(' ');
+    let bandBot = data.slice().reverse().map(d => `L ${xScale(d.alpha, W)} ${yScale(d.lo)}`).join(' ');
+    s += `<path class="ci-band" d="${bandTop} ${bandBot} Z"/>`;
+
+    // line
+    let linePath = data.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.alpha, W)} ${yScale(d.coef)}`).join(' ');
+    s += `<path class="line-coef" d="${linePath}"/>`;
+
+    // dots
+    data.forEach((d, i) => {
+      const x = xScale(d.alpha, W), y = yScale(d.coef);
+      s += `<circle class="${d.sig ? 'dot-sig' : 'dot-nonsig'}" cx="${x}" cy="${y}" r="5.5"/>`;
+    });
+    // direct labels for first & last
+    const first = data[0], last = data[data.length - 1];
+    s += `<text class="direct-label" x="${xScale(first.alpha, W) + 8}" y="${yScale(first.coef) - 10}" text-anchor="start" fill="var(--series-coef)">+${first.coef.toFixed(3)}</text>`;
+    s += `<text class="direct-label" x="${xScale(last.alpha, W) - 8}" y="${yScale(last.coef) + 18}" text-anchor="end" fill="var(--series-coef)">${last.coef.toFixed(3)}</text>`;
+
+    s += `<line class="hover-line" id="hover-coef" x1="0" x2="0" y1="${padT}" y2="${H - padB}"/>`;
+    s += `<rect class="hit" x="${padL}" y="${padT}" width="${W - padL - padR}" height="${plotH}" id="hit-coef"/>`;
+
+    svg.innerHTML = s;
+
+    const hit = document.getElementById('hit-coef');
+    const hoverLine = document.getElementById('hover-coef');
+    hit.addEventListener('mousemove', (e) => {
+      const rect = svg.getBoundingClientRect();
+      const scaleX = W / rect.width;
+      const mx = (e.clientX - rect.left) * scaleX;
+      let nearest = data[0], nd = Infinity;
+      data.forEach(d => { const dx = Math.abs(xScale(d.alpha, W) - mx); if (dx < nd) { nd = dx; nearest = d; } });
+      const x = xScale(nearest.alpha, W);
+      hoverLine.setAttribute('x1', x); hoverLine.setAttribute('x2', x); hoverLine.style.opacity = 1;
+      tooltip.innerHTML = `<div class="t-title">&alpha; = ${nearest.alpha.toFixed(2)} &times; max</div>
+        <div class="t-row">coef: <b>${nearest.coef >= 0 ? '+' : ''}${nearest.coef.toFixed(4)}</b></div>
+        <div class="t-row">95% CI: <b>[${nearest.lo.toFixed(3)}, ${nearest.hi.toFixed(3)}]</b></div>
+        <div class="t-row">p-value: <b>${nearest.p.toFixed(3)}</b> ${nearest.sig ? '(sig.)' : '(n.s.)'}</div>`;
+      tooltip.style.opacity = 1;
+      const svgRect = svg.getBoundingClientRect();
+      tooltip.style.left = (e.clientX - svgRect.left + svgRect.left + 14) + 'px';
+      tooltip.style.top = (e.clientY - 10) + 'px';
+    });
+    hit.addEventListener('mouseleave', () => { hoverLine.style.opacity = 0; tooltip.style.opacity = 0; });
+  })();
+
+  // ================= data table =================
+  const tbody = document.getElementById('data-table-body');
+  tbody.innerHTML = data.map(d => `
+    <tr>
+      <td>${d.alpha.toFixed(2)}</td>
+      <td>${d.corr.toFixed(4)}</td>
+      <td class="${d.sig ? 'sig' : ''}">${d.coef >= 0 ? '+' : ''}${d.coef.toFixed(4)}</td>
+      <td>${d.se.toFixed(4)}</td>
+      <td class="${d.sig ? 'sig' : ''}">${d.p.toFixed(3)}</td>
+      <td>${d.r2.toFixed(4)}</td>
+    </tr>
+  `).join('');
+})();
+</script>

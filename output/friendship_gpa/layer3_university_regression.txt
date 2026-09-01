@@ -1,0 +1,32 @@
+LAYER 3: university subsample -- gpa ~ katz_z + avg_friend_gpa + C(group)
+SEs clustered by student.
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                    gpa   R-squared:                       0.124
+Model:                            OLS   Adj. R-squared:                  0.123
+Method:                 Least Squares   F-statistic:                     193.2
+Date:                Wed, 02 Sep 2026   Prob (F-statistic):          6.07e-190
+Time:                        00:33:37   Log-Likelihood:                -51522.
+No. Observations:               34164   AIC:                         1.031e+05
+Df Residuals:                   34158   BIC:                         1.031e+05
+Df Model:                           5                                         
+Covariance Type:              cluster                                         
+==========================================================================================
+                             coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------------------
+Intercept                  3.7785      0.135     28.049      0.000       3.514       4.043
+C(group)[T.juniors]       -0.1012      0.040     -2.525      0.012      -0.180      -0.023
+C(group)[T.seniors]        0.0299      0.041      0.733      0.464      -0.050       0.110
+C(group)[T.sophomores]    -0.1783      0.038     -4.750      0.000      -0.252      -0.105
+katz_z                     0.0980      0.013      7.641      0.000       0.073       0.123
+avg_friend_gpa             0.4797      0.018     27.372      0.000       0.445       0.514
+==============================================================================
+Omnibus:                      384.300   Durbin-Watson:                   1.903
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              394.610
+Skew:                          -0.258   Prob(JB):                     2.05e-86
+Kurtosis:                       2.897   Cond. No.                         83.9
+==============================================================================
+
+Notes:
+[1] Standard Errors are robust to cluster correlation (CRV1)

@@ -1,0 +1,36 @@
+HEADLINE TEST (pre-specified before any alpha-sweep exploration)
+gpa ~ katz_z + indeg_z + outdeg_z + avg_friend_gpa + C(group)
+alpha = 0.85 / lambda_max (baseline choice from step 01, not selected post-hoc from the sweep). SEs clustered by student.
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                    gpa   R-squared:                       0.446
+Model:                            OLS   Adj. R-squared:                  0.446
+Method:                 Least Squares   F-statistic:                     2158.
+Date:                Wed, 02 Sep 2026   Prob (F-statistic):               0.00
+Time:                        00:34:50   Log-Likelihood:                -54220.
+No. Observations:               36696   AIC:                         1.085e+05
+Df Residuals:                   36687   BIC:                         1.085e+05
+Df Model:                           8                                         
+Covariance Type:              cluster                                         
+==========================================================================================
+                             coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------------------
+Intercept                  3.8091      0.132     28.867      0.000       3.550       4.068
+C(group)[T.juniors]       -0.1020      0.040     -2.558      0.011      -0.180      -0.024
+C(group)[T.school]        -1.7925      0.071    -25.317      0.000      -1.931      -1.654
+C(group)[T.seniors]        0.0300      0.041      0.738      0.461      -0.050       0.110
+C(group)[T.sophomores]    -0.1798      0.037     -4.804      0.000      -0.253      -0.106
+katz_z                    -0.0415      0.019     -2.136      0.033      -0.080      -0.003
+indeg_z                    0.1242      0.019      6.373      0.000       0.086       0.162
+outdeg_z                   0.0642      0.014      4.468      0.000       0.036       0.092
+avg_friend_gpa             0.4757      0.017     27.731      0.000       0.442       0.509
+==============================================================================
+Omnibus:                      348.864   Durbin-Watson:                   1.912
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              358.769
+Skew:                          -0.242   Prob(JB):                     1.24e-78
+Kurtosis:                       3.001   Cond. No.                         96.5
+==============================================================================
+
+Notes:
+[1] Standard Errors are robust to cluster correlation (CRV1)
