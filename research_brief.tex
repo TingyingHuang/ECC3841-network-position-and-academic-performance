@@ -8,7 +8,7 @@
 \usepackage[hidelinks]{hyperref}
 
 \setlist[itemize]{topsep=2pt,itemsep=1pt,leftmargin=1.4em}
-\setlist[enumerate]{topsep=2pt,itemsep=3pt,leftmargin=1.7em}
+\setlist[enumerate]{topsep=2pt,itemsep=2pt,leftmargin=1.7em}
 
 \title{\vspace{-2em}\textbf{\LARGE Network Position and Academic Performance}\\[0.4em]
 \large Adding Network Centrality to Smirnov \& Thurner (2017)}
@@ -21,205 +21,167 @@
 
 \section*{Introduction}
 
-Students do not make academic decisions in isolation. A student's friendship network
-can give them access to information, academic advice, study partners, and motivation,
-so a student's \emph{position} within that network may affect their grades. Rather than
-assume that social connections help everyone equally, we ask whether the academic
-benefit of being well connected differs across students.
+A student's grades depend on effort and ability. They also depend on the student's
+friends. A friendship network gives access to information, advice, study partners, and
+motivation. So where a student sits in the network may matter for grades. We ask
+whether it does.
 
 \section*{Research question}
 
-Does a student's position in a friendship network affect their academic performance,
-independently of who their direct friends are?
+Does a student's position in a friendship network affect their grades, on top of who
+their direct friends are?
 
 \section*{Background}
 
-A student's grades depend on more than effort and ability; they also depend on the
-social world around that student. Two strands of work frame our project.
+Two papers frame the project.
 
-\textbf{Smirnov and Thurner (2017)} used a real, changing ``who-likes-who'' network of
-Russian high-school and university students. They found that friendship's effect on GPA
-is mostly \textbf{selection}: students change friends to match their own GPA, rather
-than being pulled up or down by their friends' grades. But their method only ever asks
-one thing: who are this student's friends, and what is the average GPA of those
-friends? It never asks \emph{where} the student sits in the wider network.
+\textbf{Smirnov and Thurner (2017)} tracked a changing ``who-likes-who'' network of
+Russian students. They found that the link between friends' grades is mostly
+\emph{selection}: students pick friends with similar GPA, rather than being pulled up or
+down by them. Their method looks at one number per student --- the average GPA of that
+student's direct friends. It ignores the rest of the network.
 
-\textbf{Calvó-Armengol, Patacchini and Zenou (2009; IZA DP 3859)} give the missing
-half. In their model, a student's equilibrium effort is proportional to their
-\emph{Katz--Bonacich centrality} --- a specific network-position measure, not raw
-popularity. On US friendship-nomination data they find that a one-standard-deviation
-rise in centrality raises school performance by about 7\% of a standard deviation. But
-their data are a single cross-section, so they cannot separate ``position
-$\rightarrow$ grades'' from ``grades $\rightarrow$ more friends $\rightarrow$ higher
-centrality.''
+\textbf{Calvó-Armengol, Patacchini and Zenou (2009; IZA DP 3859)} supply the missing
+part. In their model, a student's effort is proportional to their \emph{Katz--Bonacich
+centrality}, a measure of network position. On US data, more central students do better
+in school. But their data are one snapshot in time. So they cannot tell whether
+position raises grades, or good grades just attract more friends.
 
-Our project puts these together: we take the Katz--Bonacich prediction to the same
-longitudinal data Smirnov and Thurner released, and ask whether network position still
-predicts \emph{subsequent} GPA once we hold friend-group composition and starting GPA
+We combine the two. We take the centrality prediction to Smirnov and Thurner's data,
+which covers many time points, and test it while holding friend-group GPA and past GPA
 fixed.
 
-\section*{Theoretical framework}
+\section*{The model}
 
-Each student $i$ chooses study effort $x_i \ge 0$ with payoff
+Each student $i$ picks study effort $x_i$. Their payoff is
 \[
-u_i = a\,x_i \;-\; \tfrac{1}{2}x_i^{2}
-\;+\; \phi \sum_{j} g_{ij}\,x_i x_j ,
+u_i = a\,x_i \;-\; \tfrac{1}{2}x_i^{2} \;+\; \phi \sum_{j} g_{ij}\,x_i x_j .
 \]
-where $g_{ij}=1$ if $i$ is linked to $j$. The term $a\,x_i$ is the private return to
-effort, $-\tfrac{1}{2}x_i^{2}$ is a rising cost (diminishing returns to studying
-alone), and $\phi \sum_j g_{ij} x_i x_j$ is \textbf{strategic complementarity}: the
-harder a student's friends study, the higher that student's own marginal return to
-studying. The first-order condition gives the best response
-$x_i = a + \phi \sum_j g_{ij} x_j$, and stacking over students and solving,
-\[
-\mathbf{x} = a\,(\mathbf{I} - \phi \mathbf{G})^{-1}\mathbf{1}
-= a \cdot \mathbf{b}(g,\phi),
-\qquad
-b_i(g,\phi) = \sum_{k=0}^{\infty} \phi^{k}\,(\mathbf{G}^{k}\mathbf{1})_i .
-\]
-So equilibrium effort --- and hence achievement --- is proportional to the
-Katz--Bonacich centrality $\mathbf{b}(g,\phi)$, which counts walks of every length out
-of $i$, discounting a walk of length $k$ by $\phi^{k}$: the $k=1$ term is direct
-friends, $k=2$ is friends of friends, and so on.
+The first term is the gain from effort. The second is its rising cost. The third is the
+social part: $g_{ij}=1$ if $i$ and $j$ are friends, and $\phi>0$ means a friend
+studying more raises $i$'s own reward from studying.
 
-\paragraph{What the parameter $\phi$ means.} $\phi$ is both the strength of the
-peer complementarity and a dial that sets \emph{how far through the network} influence
-travels:
+Setting the derivative to zero gives each student's best choice:
+\[
+x_i = a + \phi \sum_{j} g_{ij}\,x_j .
+\]
+Study a baseline amount, plus more when your friends study more. Solving for everyone at
+once:
+\[
+\mathbf{x} = a\,(\mathbf{I} - \phi \mathbf{G})^{-1}\mathbf{1} = a\cdot \mathbf{b}(g,\phi).
+\]
+So effort --- and grades --- track $\mathbf{b}(g,\phi)$, the Katz--Bonacich centrality.
+It expands as
+\[
+b_i = 1 + \phi\,(\text{direct friends}) + \phi^{2}\,(\text{friends of friends})
++ \phi^{3}\,(\dots) + \cdots
+\]
+a count of everyone you can reach by paths of any length, with longer paths weighted
+less.
+
+\section*{What \texorpdfstring{$\phi$}{phi} controls}
+
+$\phi$ sets how far influence spreads through the network.
 \begin{itemize}
-  \item As $\phi \to 0$, $b_i \approx 1 + \phi\cdot(\text{in-degree})$: centrality is
-        essentially direct popularity --- only immediate neighbours matter.
-  \item As $\phi \to 1/\lambda_{\max}$, long indirect paths are weighted almost as
-        heavily as short ones: centrality reflects global position --- being a bridge
-        that reaches many separate groups.
+  \item Small $\phi$: only direct friends count. Centrality is almost the same as
+        \emph{popularity} (in-degree).
+  \item Large $\phi$ (near its ceiling): distant links count almost as much as close
+        ones. Centrality now measures \emph{reach} --- being a bridge between many
+        groups.
 \end{itemize}
-Here $\lambda_{\max}$ is the largest eigenvalue of $\mathbf{G}$; $1/\lambda_{\max}$ is
-the radius of convergence and thus the ceiling on $\phi$ (above it the feedback loop
-diverges). Denser networks have a larger $\lambda_{\max}$ and so a lower ceiling, so we
-always report $\phi$ as a \emph{fraction} of $1/\lambda_{\max}$ to keep the 38 networks
-comparable.
+So $\phi$ is a dial from ``popularity'' to ``reach.'' We compute centrality at several
+values of $\phi$ and see how the result changes along the dial.
+
+The ceiling on $\phi$ is $1/\lambda_{\max}$, where $\lambda_{\max}$ is the largest
+eigenvalue of $\mathbf{G}$; above it the model has no solution. $\lambda_{\max}$ is
+larger in bigger, denser networks, so the ceiling differs across our 38 networks. We
+set $\phi = c \cdot (1/\lambda_{\max})$ with $c$ from $0.05$ to $0.95$. Then $c$ means
+the same thing in every network, and results can be compared.
 
 \section*{Empirical strategy}
 
-For each network snapshot we build $\mathbf{G}$, compute $\lambda_{\max}$, and compute
-$\mathbf{b}(g,\phi)$ at $\phi = c \cdot (1/\lambda_{\max})$ for
-$c \in \{0.05, 0.20, 0.40, 0.60, 0.80, 0.95\}$. Centrality is standardised within each
-snapshot. We then estimate
+For each network we compute centrality at each $c$, then run
 \[
 \begin{aligned}
-\mathrm{GPA}_{i,\,t+1} = {}& \beta_0 + \beta_1\,\mathrm{Katz}_{i,t}(\phi)
+\mathrm{GPA}_{i,\,t+1} = {}& \beta_0 + \beta_1\,\mathrm{Katz}_{i,t}
   + \beta_2\,\mathrm{GPA}_{i,t}
   + \beta_3\,\overline{\mathrm{GPA}}^{\,\text{friends}}_{i,t} \\[2pt]
   & {} + \beta_4\,\mathrm{InDeg}_{i,t} + \beta_5\,\mathrm{OutDeg}_{i,t}
   + \gamma_{\text{group}} + \varepsilon_{i,t}.
 \end{aligned}
 \]
-The controls do specific work. $\beta_3$ (average friend GPA) is Smirnov and Thurner's
-own variable, so $\beta_1$ is measured \emph{net of friend-group composition}. $\beta_4$
-and $\beta_5$ (raw degree) mean $\beta_1$ is also \emph{net of raw popularity} --- the
-core question is whether Katz--Bonacich carries anything beyond simply counting friends.
-We trace $\beta_1$ across the whole $\phi$ sweep, and fix one \textbf{pre-registered}
-headline test at $\phi = 0.85 \cdot (1/\lambda_{\max})$ on the full sample, with
-standard errors clustered by student. Betweenness and eigenvector centrality are used
-as alternative position measures.
+Each control has a job. Average friend GPA is Smirnov and Thurner's variable, so
+$\beta_1$ is net of friend-group composition. In- and out-degree are raw popularity, so
+$\beta_1$ is net of that too. The real question is whether centrality adds anything
+beyond counting friends. We run this at every $c$. One test, at $c = 0.85$, is fixed in
+advance as the headline. We also try betweenness and eigenvector centrality.
 
-\section*{Identification: which way does the arrow run?}
+\section*{Which way does the arrow run?}
 
-Cross-sectional work like IZA DP 3859 cannot separate ``position raises grades'' from
-``good grades attract likes.'' Our design does not fully solve this either, but it
-makes three concrete improvements:
+Does position raise grades, or do grades attract friends? One snapshot cannot tell. Our
+data help in three ways:
 \begin{enumerate}
-  \item \textbf{Temporal ordering.} Position is measured at $t$ and GPA at $t+1$, so we
-        ask whether \emph{today's} position predicts \emph{tomorrow's} grade.
-  \item \textbf{Controlling for own past GPA.} With $\mathrm{GPA}_{i,t}$ on the
-        right-hand side we compare students who currently have the \emph{same} grade,
-        which nets out the ``being a good student attracts friends'' channel to the
-        extent it runs through the level of GPA.
-  \item \textbf{Panel structure.} Repeated snapshots allow student fixed effects, which
-        absorb stable traits (ability, conscientiousness, family background) that drive
-        both grades and popularity; and they let us estimate the reverse arrow
-        directly, regressing new likes received between $t$ and $t+1$ on the change in
-        GPA, using Smirnov and Thurner's tie-formation method.
+  \item \textbf{Time order.} Position is measured before the GPA it predicts.
+  \item \textbf{Past GPA is controlled.} We compare students who currently have the same
+        grade.
+  \item \textbf{Panel data.} We can remove fixed traits (ability, background) with
+        student fixed effects, and we can measure the reverse arrow directly: does a
+        rise in GPA bring new friends?
 \end{enumerate}
-What we still cannot claim: time-varying confounders (a student who becomes more
-motivated this term gets both more likes and better grades) are not removed; ``likes''
-are a noisy proxy for the tie that actually carries effort spillovers; and we have no
-experimental or instrumental variation. Our honest claim is that network position
-predicts \emph{subsequent} GPA holding starting GPA fixed --- not that position
-\emph{causes} grades.
+What we still cannot rule out: something that changes a student mid-term and lifts both
+grades and friend count. ``Likes'' are also a rough stand-in for real friendship. So
+our claim is that position \emph{predicts} later grades, not that it \emph{causes}
+them.
 
 \section*{Predictions}
 
-\textbf{From the model.} At a theory-consistent $\phi$, $\beta_1 > 0$ and
-Katz--Bonacich centrality beats raw degree. This is the core falsifiable claim; it
-fails if $\beta_1$ is insignificant once degree is controlled, or if it changes sign
-across the $\phi$ sweep (local and global position doing different things).
+\textbf{From the model:} $\beta_1 > 0$, and centrality beats raw degree. The claim
+fails if $\beta_1$ is not significant once degree is controlled, or if it flips sign
+along the $\phi$ dial.
 
-\textbf{Directional readings of $\beta_1$:}
+\textbf{Reading the sign of $\beta_1$:}
 \begin{itemize}
-  \item $\beta_1 > 0$: more central students gain more, through greater access to
-        information and academic resources.
-  \item $\beta_1 = 0$: access benefits and time/attention costs roughly cancel.
-  \item $\beta_1 < 0$: reaching widely across the network costs time that would
-        otherwise go to studying.
+  \item $\beta_1 > 0$: central students gain from more access to information and help.
+  \item $\beta_1 = 0$: the gains and the time costs cancel.
+  \item $\beta_1 < 0$: wide reach costs study time.
 \end{itemize}
 
 \textbf{From replicating Smirnov and Thurner:}
-\begin{enumerate}
-  \item Once we control for a student's own past GPA, (a) a friend's past GPA does not
-        predict that student's future GPA (no direct peer pressure on grades), and
-        (b) new friendships have a smaller GPA gap than friendships that end (a sign of
-        selection).
-  \item The selection effect is stronger in the university sample than in the
-        high-school sample: university students have more freedom to change their
-        social circle through new courses, clubs, and dorms.
-\end{enumerate}
+\begin{itemize}
+  \item A friend's past GPA does not predict a student's future GPA, once own past GPA
+        is controlled.
+  \item New friendships show a smaller GPA gap than ending ones --- a sign of selection.
+  \item Selection is stronger at university than in high school, where students can
+        change their circle more easily.
+\end{itemize}
 
-\section*{Model structure}
+\section*{Data and network}
 
-\textbf{Nodes:} individual students (655 high-school students; 1{,}200--1{,}549 students
-per university year --- freshmen, sophomores, juniors, seniors).
-
-\textbf{Edges:} directed ``like'' ties from a social media site. An edge from $i$ to $j$
-means $i$ gave $j$ at least one like within a 3-month period. We observe 2 to 14
-snapshots per group (38 in total). Only 24--27\% of ties are reciprocal, so a ``friend''
-here means ``someone I chose to like,'' not a confirmed two-way friendship.
-
-\textbf{Node attributes:}
-\begin{enumerate}
-  \item GPA (the outcome; a time series for the high-school group, a single measurement
-        for the four university groups).
-  \item Network position: in-degree, out-degree, Katz--Bonacich centrality (several
-        values of $\phi$), betweenness, eigenvector centrality.
-  \item Group / level: high school vs.\ university, and the specific class-year.
-\end{enumerate}
-
-\section*{Data and related studies}
-
-\textbf{Data.} Smirnov \& Thurner (2017) replication data, Harvard Dataverse
+\textbf{Data:} Smirnov \& Thurner (2017) replication files, Harvard Dataverse
 (\href{https://doi.org/10.7910/DVN/SZA9YW}{doi:10.7910/\allowbreak DVN/\allowbreak
-SZA9YW}): directed ``like'' ties among about 6{,}200 Russian students on a social media
-site, observed every 3 months, with GPA. Using the same data lets us compare our
-results directly with the original paper.
+SZA9YW}). About 6{,}200 Russian students, grades plus ``like'' ties every 3 months.
+
+\textbf{Nodes:} students. 655 in high school; 1{,}200--1{,}549 per university year.
+
+\textbf{Edges:} directed ``like'' ties. $i \to j$ means $i$ liked $j$ at least once in a
+3-month window. 2 to 14 snapshots per group, 38 in total. Only 24--27\% of ties go both
+ways.
+
+\textbf{Attributes:} GPA; in-degree, out-degree, Katz--Bonacich (several $\phi$),
+betweenness, eigenvector; high school vs.\ university and year.
+
+\section*{Related studies}
 
 \begin{enumerate}
   \item \textbf{Calvó-Armengol, Patacchini \& Zenou (2009), ``Peer Effects and Social
-        Networks in Education''} (\emph{Review of Economic Studies}; IZA DP 3859). The
-        structural model above: equilibrium effort is proportional to Katz--Bonacich
-        centrality, tested on AddHealth friendship nominations. Nodes: students. Edges:
-        best-friend nominations from a school roster. Node attribute: school
-        performance. Limitation we address: a single cross-section, so the direction of
-        the effect is not identified.
+        Networks in Education''} (IZA DP 3859). The model above, tested on AddHealth
+        friendship data. Limit: one snapshot, so cause and effect are not separated.
   \item \textbf{Giulietti, Vlassopoulos \& Zenou (2020), ``Peers, Gender, and
-        Long-Term Depression''} (IZA DP 13680). Exposure to peers' depression in
-        adolescence predicts own adult depression, for females only; family
-        socioeconomic background acts as a moderator, not the main driver. Nodes:
-        students. Edges: shared school--cohort--gender reference group, not individual
-        friendship ties. Node attribute: adult depression status. One author, Yves
-        Zenou, teaches this course.
-  \item \textbf{Smirnov, I., \& Thurner, S. (2017).} ``Formation of homophily in
-        academic performance: Students change their friends rather than performance.''
-        \emph{PLOS ONE} 12(8): e0183473. The paper and dataset this project builds on
-        and replicates.
+        Long-Term Depression''} (IZA DP 13680). Peer depression in school predicts adult
+        depression, for women. Uses reference groups, not friendship ties. Zenou teaches
+        this course.
+  \item \textbf{Smirnov \& Thurner (2017),} \emph{PLOS ONE} 12(8): e0183473. The paper
+        and data this project replicates and extends.
 \end{enumerate}
 
 \end{document}
