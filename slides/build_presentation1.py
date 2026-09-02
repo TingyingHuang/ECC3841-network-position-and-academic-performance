@@ -163,19 +163,18 @@ def centered_left(width):
 
 # ===================================================== 1 -- title
 s = add_slide()
-rounded_box(s, Inches(0.9), Inches(2.75), Inches(0.55), Inches(1.7),
-            fill=ORANGE, border=ORANGE)
-add_text(s, Inches(1.75), Inches(2.15), Inches(11.0), Inches(0.5),
+pic(s, "decor_network.png", Inches(9.05), Inches(0.35), height=Inches(4.0))
+add_text(s, Inches(0.9), Inches(2.05), Inches(11.5), Inches(0.5),
          "ECC3841 NETWORK ECONOMICS  ·  PRESENTATION 1",
          size=13, bold=True, color=ORANGE)
-add_text(s, Inches(1.75), Inches(2.75), Inches(11.0), Inches(1.9),
+add_text(s, Inches(0.9), Inches(2.65), Inches(11.5), Inches(1.9),
          "Network Position and\nAcademic Performance",
          size=44, bold=True, color=DARK, font=FONT_HEAD, line_spacing=1.05)
-add_text(s, Inches(1.75), Inches(4.85), Inches(10.6), Inches(1.0),
+add_text(s, Inches(0.9), Inches(4.75), Inches(11.4), Inches(1.0),
          "Does where you sit in a friendship network predict your grades,\n"
          "beyond who your direct friends are?",
          size=18, color=GRAY_TEXT, italic=True, line_spacing=1.3)
-add_text(s, Inches(1.75), Inches(6.55), Inches(9), Inches(0.5),
+add_text(s, Inches(0.9), Inches(6.55), Inches(9), Inches(0.5),
          "Team [names]  ·  [Date]", size=13, color=GRAY_TEXT)
 
 # ===================================================== 2 -- the puzzle
