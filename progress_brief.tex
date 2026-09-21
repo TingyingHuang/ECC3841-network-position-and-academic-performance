@@ -1,0 +1,159 @@
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{parskip}
+\usepackage[hidelinks]{hyperref}
+
+\setlist[itemize]{topsep=2pt,itemsep=1pt,leftmargin=1.4em}
+\setlist[enumerate]{topsep=2pt,itemsep=2pt,leftmargin=1.7em}
+
+\title{\vspace{-2em}\textbf{\LARGE Network Position and Academic Performance}\\[0.4em]
+\large What We Found So Far}
+\author{}
+\date{ECC3841 Network Economics --- Presentation 2, Progress Report}
+
+\begin{document}
+\maketitle
+\vspace{-2.5em}
+
+\section*{Where we left off}
+
+Presentation 1 asked one question: does a student's position in a friendship network
+predict their grades, on top of who their direct friends are and on top of raw
+popularity? The plan was to measure Katz--Bonacich centrality across a range of the
+decay parameter $\phi$, and test it while holding friend-group GPA and popularity
+fixed. This brief reports what that test actually found, including a gap in our own
+design that we found and fixed along the way.
+
+\section*{What we did}
+
+Four steps, each building on the last.
+\begin{enumerate}
+  \item Replicate Smirnov and Thurner's two checks, to confirm the data behaves the
+        way they reported.
+  \item Run centrality on its own, without controlling for popularity: the naive test.
+  \item Add popularity as a control and sweep $\phi$, pooling all five student groups:
+        the test planned in Presentation 1.
+  \item Check that test's assumptions, find one was not actually met, and re-run the
+        confirmatory test properly in the one sample where it can be.
+\end{enumerate}
+
+\section*{Result 1: the replication holds}
+
+Controlling for a student's own past GPA (coefficient $0.955$, school group,
+$n=2{,}088$, $R^2=0.908$), a friend's past GPA does not predict that student's future
+GPA: coefficient $-0.0055$, $p=0.557$. New friendships show a smaller GPA gap than
+friendships about to end: university, $-0.021$, $p<0.001$; high school, $-0.010$,
+$p=0.183$, same direction, not significant. Both match Smirnov and Thurner. This is
+the foundation the rest of the brief builds on.
+
+\section*{Result 2: the naive centrality effect is popularity, relabelled}
+
+Katz--Bonacich on its own, net of friend GPA, pooled across all five groups
+($n=36{,}696$): coefficient $+0.093$ (standardized), $p<0.001$. Looks like position
+matters. Add raw in-degree and out-degree to the same regression: the coefficient
+drops to $-0.028$, $p=0.446$, no longer significant, while in-degree itself is
+$+0.153$, $p<0.001$. The naive effect was popularity wearing a different name.
+
+\section*{Result 3: the planned headline test, and a gap in it}
+
+Sweeping $\phi$, net of friend GPA and popularity, pooled across all five groups:
+
+\begin{center}
+\begin{tabular}{lrrrrrr}
+$\phi$ (frac.\ of ceiling) & 0.05 & 0.20 & 0.40 & 0.60 & 0.80 & 0.95 \\
+\hline
+Katz coefficient & $+0.082$ & $+0.022$ & $-0.034$ & $-0.051$ & $-0.048$ & $-0.036$ \\
+$p$-value & $0.012$ & $0.598$ & $0.407$ & $0.115$ & $0.031$ & $0.011$ \\
+\end{tabular}
+\end{center}
+
+At $\phi=0.85$ (fixed in advance as the headline): coefficient $-0.0415$,
+$\mathrm{SE}=0.019$, $p=0.033$, $n=36{,}696$. Read at face value: net of popularity and
+friend GPA, position has a small, negative, independent effect.
+
+But this regression never controlled for a student's own past GPA, and it should
+have. GPA is time-varying only for the 655 high-school students (6 measurements over
+time). For the four university cohorts, \texttt{data.mat} stores a single, static GPA
+value per student --- not a column that happens to be constant, but literally one
+column. Own past GPA cannot be built as a separate regressor for over 80\% of these
+36,696 observations. Presentation 1's model equation promised this control. The test
+we actually ran did not have it.
+
+\section*{Result 4: the corrected test}
+
+Restrict the confirmatory test to the one sample where a genuine $t \to t+1$ design
+with an own-GPA control is possible: high school, $n=2{,}088$ (535 students, up to 5
+transitions each).
+
+Before trusting it, we checked whether adding own past GPA collides with the other
+regressors. It does not: it correlates $0.008$ with Katz, $0.065$ with in-degree,
+$0.122$ with out-degree, $0.285$ with friend GPA; variance inflation factor $1.11$.
+(Katz and in-degree still correlate at $0.866$, VIF $\approx 4$ --- expected, and
+exactly what sweeping $\phi$ is for.)
+
+\begin{center}
+\begin{tabular}{lrrrrrr}
+$\phi$ (frac.\ of ceiling) & 0.05 & 0.20 & 0.40 & 0.60 & 0.80 & 0.95 \\
+\hline
+Katz coefficient & $-0.004$ & $-0.002$ & $+0.001$ & $+0.003$ & $+0.004$ & $+0.005$ \\
+$p$-value & $0.62$ & $0.84$ & $0.93$ & $0.74$ & $0.51$ & $0.36$ \\
+\end{tabular}
+\end{center}
+
+At every $\phi$, not significant, and the sign is not even consistent. Once a
+student's own trajectory is properly controlled, in the one sample where that is
+possible, Katz--Bonacich centrality does not predict GPA.
+
+\begin{center}
+\fbox{\parbox{0.9\linewidth}{\centering
+Net of popularity, friend GPA, and a student's own past performance, we find no
+evidence that network position independently predicts grades. The effects that
+appeared in Results 2 and 3 do not survive a correctly specified test.}}
+\end{center}
+
+\section*{Why this is still worth reporting}
+
+Three specifications, three different pictures: naive centrality looked positive,
+the pooled sweep looked negative, the corrected test looks like nothing. The first two
+looked like findings and neither survived scrutiny. That progression is itself the
+result:
+\begin{itemize}
+  \item It is the first time this claim --- that Katz--Bonacich centrality
+        (Calv\'o-Armengol, Patacchini \& Zenou, 2009) independently predicts
+        achievement --- has been tested with a real time lag and an own-performance
+        control, which their cross-sectional data could not support.
+  \item It shows a general risk: pooling groups with different data structures (GPA
+        that varies over time in one, static in four) can manufacture a significant
+        coefficient that the one correctly specified subsample does not support.
+  \item It is a decision-relevant answer: interventions built around widening
+        students' network reach are not supported by this data once the obvious
+        confounds --- popularity, friend quality, the student's own trajectory --- are
+        properly controlled.
+\end{itemize}
+
+\section*{Limitations and what's next}
+
+\begin{itemize}
+  \item The corrected test has $n=2{,}088$ from 535 students --- a much wider
+        confidence interval than the pooled test's 36,696.
+  \item It cannot be extended to the university cohorts: their GPA is a single
+        measurement, not a time series, so no lagged design is possible for them with
+        this data.
+  \item The earlier pattern --- the effect concentrated in sparser networks --- was
+        found under the pooled specification, without an own-GPA control. It has not
+        been re-checked under the corrected specification and should be treated as
+        unconfirmed.
+  \item Betweenness and eigenvector centrality were checked in the naive horse race
+        only (both similarly explained by degree); neither has been run through the
+        corrected, school-only design yet.
+\end{itemize}
+
+\vspace{1em}
+\noindent\textit{Full study setup, the model, and the identification strategy:
+research\_brief.pdf. This brief reports what running that plan actually found.}
+
+\end{document}
