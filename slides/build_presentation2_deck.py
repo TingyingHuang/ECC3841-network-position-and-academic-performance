@@ -91,8 +91,34 @@ def title(s, t, size=26):
     text(s, 0.7, 0.8, 11.9, 1.0, t, size=size, bold=True, color=DARK, font=HEAD, spacing=1.05)
 
 
-def takeaway(s, t, color=DARK, bold=True, top=6.75):
-    text(s, 0.7, top, 11.9, 0.6, t, size=15, bold=bold, color=color)
+LBLUE = RGBColor(0xE9, 0xF0, 0xFA)
+LGREEN = RGBColor(0xE9, 0xF5, 0xEC)
+
+
+def takeaway(s, t, kind="claim", top=6.55, height=0.65, size=14):
+    fc, ec = (LBLUE, BLUE) if kind == "claim" else (CARD, BORDER)
+    box(s, 0.7, top, 11.9, height, t, fc=fc, ec=ec, tcolor=DARK, size=size, bold=(kind == "claim"))
+
+
+def pill(s, x, y, txt, fc=BLUE, w=None, h=0.32, size=11):
+    w = w if w else 0.13 * len(txt) + 0.35
+    c = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
+    c.adjustments[0] = 0.5
+    c.fill.solid(); c.fill.fore_color.rgb = fc
+    c.line.fill.background(); c.shadow.inherit = False
+    tf = c.text_frame; tf.word_wrap = False; tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    tf.margin_left = tf.margin_right = Inches(0.08)
+    p = tf.paragraphs[0]; p.alignment = PP_ALIGN.CENTER
+    r = p.add_run(); r.text = txt
+    r.font.size = Pt(size); r.font.bold = True; r.font.color.rgb = WHITE; r.font.name = BODY
+    return c
+
+
+def accent_bar(s, x, y, h, w=0.09, color=ORANGE):
+    r = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
+    r.fill.solid(); r.fill.fore_color.rgb = color
+    r.line.fill.background(); r.shadow.inherit = False
+    return r
 
 
 def figure(s, name, top=1.65, height=4.85, folder=A):
@@ -120,6 +146,10 @@ def box(s, x, y, w, h, txt, fc=WHITE, ec=BORDER, tcolor=DARK, size=13, bold=Fals
 
 # ===================================================== 1. title
 s = slide()
+dec = s.shapes.add_picture(str(ROOT / "assets" / "decor_network.png"),
+                            Inches(9.7), Inches(4.7), width=Inches(3.1))
+dec.left = int(prs.slide_width - dec.width - Inches(0.35))
+accent_bar(s, 0.55, 2.58, 1.55)
 text(s, 0.9, 2.0, 11.5, 0.5, "ECC3841 NETWORK ECONOMICS  ·  PRESENTATION 2",
      size=13, bold=True, color=ORANGE)
 text(s, 0.9, 2.55, 11.5, 1.9, "Network Position and\nAcademic Performance",
@@ -150,7 +180,7 @@ for i, (n, head, desc) in enumerate(steps):
     box(s, x, 3.1, bw, 0.85, n, fc=ORANGE, tcolor=WHITE, size=20, bold=True)
     text(s, x, 4.1, bw, 0.5, head, size=15, bold=True, color=DARK, align=PP_ALIGN.CENTER)
     text(s, x, 4.6, bw, 1.4, desc, size=12.5, color=GRAY, align=PP_ALIGN.CENTER, spacing=1.25)
-takeaway(s, "This brief reports what running that plan actually found.", bold=False, color=GRAY)
+takeaway(s, "This brief reports what running that plan actually found.", kind="fact", top=6.6)
 pagenum(s, 2)
 
 # ===================================================== 3. result 1
@@ -165,7 +195,7 @@ bullets(s, 0.7, 1.9, 11.9, 4.2, [
     "university sample (p < 0.001); same direction in high school, not significant.",
 ], size=17, gap=18)
 takeaway(s, "Both match Smirnov & Thurner. This is the foundation everything else builds on.",
-         color=ORANGE)
+         kind="claim", top=6.6)
 pagenum(s, 3)
 
 # ===================================================== 4. result 2 (naive)
@@ -179,45 +209,46 @@ bullets(s, 0.7, 1.9, 11.9, 3.5, [
     "−0.028, p = 0.446 — no longer significant.",
     "In-degree itself: +0.153, p < 0.001. That's what was driving the naive result.",
 ], size=17, gap=18)
-takeaway(s, "The naive effect was popularity wearing a different name.", color=ORANGE)
+takeaway(s, "The naive effect was popularity wearing a different name.", kind="claim", top=6.6)
 pagenum(s, 4)
 
 # ===================================================== 5. the gap we found
 s = slide()
 eyebrow(s, "RESULT 3")
 title(s, "The planned test, and a gap we found in it")
-figure(s, "fig_p2_gpa_gap.png", top=1.55, height=4.55)
+figure(s, "fig_p2_gpa_gap.png", top=1.55, height=4.35)
 takeaway(s, "Own past GPA can only be built for the school group — the other 80% of the "
-             "pooled sample can't have it.", color=ORANGE)
+             "pooled sample can't have it.", kind="claim", top=6.35, height=0.85)
 pagenum(s, 5)
 
 # ===================================================== 6. three specs
 s = slide()
 eyebrow(s, "COMPARING THE THREE TESTS")
 title(s, "Three specifications, three different pictures")
-figure(s, "fig_p2_three_specs.png", top=1.55, height=4.9)
+figure(s, "fig_p2_three_specs.png", top=1.55, height=4.65)
 takeaway(s, "The corrected test — the only one with own past GPA properly controlled — finds nothing.",
-         bold=False, color=GRAY)
+         kind="fact", top=6.35, height=0.7)
 pagenum(s, 6)
 
 # ===================================================== 7. phi sweep compare
 s = slide()
 eyebrow(s, "ROBUSTNESS")
 title(s, "Checked across the whole φ range, not just one value")
-figure(s, "fig_p2_phi_compare.png", top=1.55, height=4.9)
+figure(s, "fig_p2_phi_compare.png", top=1.55, height=4.65)
 takeaway(s, "Before the fix, the line swings from significantly positive to significantly "
-             "negative. After it, it's flat.", bold=False, color=GRAY)
+             "negative. After it, it's flat.", kind="fact", top=6.35, height=0.7)
 pagenum(s, 7)
 
 # ===================================================== 8. conclusion
 s = slide()
 eyebrow(s, "CONCLUSION")
 title(s, "What this means")
-box(s, 0.7, 1.75, 11.9, 1.1,
+pill(s, 0.7, 1.68, "HEADLINE FINDING", fc=GREEN)
+box(s, 0.7, 2.05, 11.9, 1.1,
     "Net of popularity, friend GPA, and a student's own past performance, we find no "
     "evidence that network position independently predicts grades.",
-    fc=RGBColor(0xE9, 0xF5, 0xEC), ec=GREEN, size=17, bold=True)
-bullets(s, 0.7, 3.15, 11.9, 3.3, [
+    fc=LGREEN, ec=GREEN, size=17, bold=True)
+bullets(s, 0.7, 3.45, 11.9, 3.3, [
     "This is the first time this claim has been tested with a real time lag and an "
     "own-performance control — a cross-section could never support that.",
     "It shows a general risk: pooling groups with different data structures can "
@@ -246,6 +277,10 @@ pagenum(s, 9)
 
 # ===================================================== 10. thanks
 s = slide()
+dec = s.shapes.add_picture(str(ROOT / "assets" / "decor_network.png"),
+                            0, Inches(0.9), width=Inches(2.6))
+dec.left = int(prs.slide_width - dec.width - Inches(0.5))
+accent_bar(s, 0.55, 2.63, 0.95)
 text(s, 0.9, 2.6, 11, 1.2, "Thank you", size=42, bold=True, color=DARK, font=HEAD)
 text(s, 0.95, 4.0, 11, 0.6,
      "Full numbers and setup: research_brief.pdf and progress_brief.pdf.", size=15, color=GRAY)
