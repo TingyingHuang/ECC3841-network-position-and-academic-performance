@@ -1,0 +1,50 @@
+SCHOOL-ONLY HEADLINE TEST
+gpa_(t+1) ~ Katz_z(alpha=0.85) + GPA_t_z (own past GPA) + avg_friend_gpa_t + indeg_z + outdeg_z
+n = 2088, students = 535
+SEs clustered by student.
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                 gpa_t1   R-squared:                       0.909
+Model:                            OLS   Adj. R-squared:                  0.909
+Method:                 Least Squares   F-statistic:                     3844.
+Date:                Mon, 21 Sep 2026   Prob (F-statistic):               0.00
+Time:                        19:24:25   Log-Likelihood:                 765.67
+No. Observations:                2088   AIC:                            -1519.
+Df Residuals:                    2082   BIC:                            -1485.
+Df Model:                           5                                         
+Covariance Type:              cluster                                         
+====================================================================================
+                       coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------------
+Intercept            3.8604      0.037    104.461      0.000       3.788       3.933
+katz_t_z             0.0046      0.006      0.757      0.449      -0.007       0.017
+gpa_t_z              0.5247      0.004    131.668      0.000       0.517       0.533
+avg_friend_gpa_t    -0.0042      0.009     -0.443      0.657      -0.023       0.014
+indeg_t_z           -0.0011      0.007     -0.166      0.868      -0.014       0.012
+outdeg_t_z           0.0073      0.002      3.278      0.001       0.003       0.012
+==============================================================================
+Omnibus:                      506.871   Durbin-Watson:                   1.988
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):            27614.107
+Skew:                           0.144   Prob(JB):                         0.00
+Kurtosis:                      20.813   Cond. No.                         45.9
+==============================================================================
+
+Notes:
+[1] Standard Errors are robust to cluster correlation (CRV1)
+
+RHS correlation matrix:
+                  katz_t_z  gpa_t_z  avg_friend_gpa_t  indeg_t_z  outdeg_t_z
+katz_t_z             1.000    0.008            -0.061      0.866       0.360
+gpa_t_z              0.008    1.000             0.285      0.065       0.122
+avg_friend_gpa_t    -0.061    0.285             1.000     -0.031       0.013
+indeg_t_z            0.866    0.065            -0.031      1.000       0.381
+outdeg_t_z           0.360    0.122             0.013      0.381       1.000
+
+VIF:
+        variable      vif
+        katz_t_z 4.053834
+         gpa_t_z 1.114917
+avg_friend_gpa_t 1.093456
+       indeg_t_z 4.116484
+      outdeg_t_z 1.189956
