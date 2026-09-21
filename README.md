@@ -52,13 +52,7 @@ ECC3841 project/
     ├── Presentation2.pptx                 ← Presentation 2 deck (python-pptx)
     ├── build_presentation2_deck.py        ← regenerates Presentation2.pptx from assets_p2/
     ├── build_assets_p2.py                 ← regenerates every figure in assets_p2/
-    ├── assets_p2/                         ← P2 figures
-    └── beamer_p2/                         ← Presentation 2, alternate Beamer/LaTeX version
-        ├── talk.tex, talk.pdf             ← the deck (econ-slides skill, 10-min progress-report format)
-        ├── script.tex, script.pdf         ← timed speaker script + conditional Q&A appendix
-        ├── results.tex                    ← shared title/result macros for talk.tex + script.tex
-        ├── structure-plan.md              ← claim-evidence ledger and frame plan behind the deck
-        └── figures/                       ← copies of the assets_p2/ exhibits it reuses
+    └── assets_p2/                         ← P2 figures
 ```
 
 ---

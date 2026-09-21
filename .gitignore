@@ -5,7 +5,3 @@ __pycache__/
 
 # third-party papers kept for our own reading; not ours to publish
 references/
-
-# LaTeX build scratch (aux/log/nav/toc + page-render PNGs); talk.pdf and
-# script.pdf are copied out to slides/beamer_p2/ as the tracked deliverables
-slides/beamer_p2/build/
