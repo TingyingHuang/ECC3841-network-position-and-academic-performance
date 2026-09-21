@@ -3,9 +3,12 @@ Figures for Presentation 2 (progress report / preliminary results).
 Numbers are hard-coded from output/friendship_gpa/*.txt|csv -- see
 progress_brief.pdf for the source of each.
 
-    fig_p2_three_specs.png   naive vs pooled-headline vs corrected coefficient
-    fig_p2_phi_compare.png   phi sweep: pooled (before fix) vs school-only (after fix)
-    fig_p2_gpa_gap.png       why the pooled test couldn't control own-past-GPA
+    fig_p2_three_specs.png     naive vs pooled-headline vs corrected coefficient
+    fig_p2_phi_compare.png     phi sweep: pooled (before fix) vs school-only (after fix)
+    fig_p2_gpa_gap.png         why the pooled test couldn't control own-past-GPA
+    fig_p2_result1_arrows.png  replication: own-past-GPA vs friend-past-GPA, as a flow diagram
+    fig_p2_naive_reveal.png    naive Katz vs Katz+degree vs in-degree, as a bar reveal
+    fig_p2_reciprocal_ties.png one-way "like" vs mutual "like", the planned next test
 """
 from pathlib import Path
 
@@ -13,7 +16,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import FancyBboxPatch
+from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
 ASSETS = Path(__file__).resolve().parent / "assets_p2"
 ASSETS.mkdir(exist_ok=True)
@@ -137,9 +140,114 @@ def fig_gpa_gap():
     save(fig, "fig_p2_gpa_gap.png")
 
 
+# ============================================================ 4. result 1 arrows
+def fig_result1_arrows():
+    fig, ax = plt.subplots(figsize=(6.4, 4.7))
+    ax.axis("off")
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 6)
+
+    node_style = dict(boxstyle="round,pad=0.55", lw=1.4)
+    target = (8.4, 3.35)
+
+    ax.text(1.5, 4.5, "Your GPA\ntoday", ha="center", va="center", fontsize=12.5,
+            fontweight="bold", color=INK,
+            bbox=dict(fc="white", ec=GREEN, **node_style))
+    ax.text(1.5, 1.5, "Friend's GPA\ntoday", ha="center", va="center", fontsize=12.5,
+            fontweight="bold", color=INK,
+            bbox=dict(fc="white", ec=FAINT, **node_style))
+    ax.text(*target, "Your GPA\nnext term", ha="center", va="center", fontsize=12.5,
+            fontweight="bold", color=INK,
+            bbox=dict(fc="white", ec=INK, **node_style))
+
+    ax.add_patch(FancyArrowPatch((2.7, 4.35), (7.0, 3.7), arrowstyle="-|>",
+                                  mutation_scale=22, linewidth=3.2, color=GREEN, zorder=3))
+    ax.text(4.7, 4.75, "β = 0.955", ha="center", fontsize=13, fontweight="bold", color=GREEN)
+    ax.text(4.7, 4.28, "very strong", ha="center", fontsize=10.5, style="italic", color=GREEN)
+
+    ax.add_patch(FancyArrowPatch((2.7, 1.6), (7.0, 3.0), arrowstyle="-|>",
+                                  mutation_scale=18, linewidth=1.6, color=GRAY,
+                                  linestyle=(0, (5, 3)), zorder=2))
+    ax.text(4.7, 1.15, "p = 0.557", ha="center", fontsize=13, fontweight="bold", color=GRAY)
+    ax.text(4.7, 0.68, "no effect", ha="center", fontsize=10.5, style="italic", color=GRAY)
+
+    fig.subplots_adjust(left=0.02, right=0.98, top=0.98, bottom=0.02)
+    save(fig, "fig_p2_result1_arrows.png")
+
+
+# ============================================================ 5. naive reveal
+def fig_naive_reveal():
+    rows = [
+        ("In-degree itself", 0.153, True),
+        ("Katz + degree control", -0.028, False),
+        ("Katz-Bonacich alone", 0.093, True),
+    ]
+    fig, ax = plt.subplots(figsize=(6.6, 4.4))
+    ys = np.arange(len(rows))
+    for y, (label, val, sig) in zip(ys, rows):
+        col = GREEN if (sig and val > 0) else (RED if (sig and val < 0) else GRAY)
+        ax.barh([y], [val], color=col, height=0.5, zorder=3)
+        tag = f"{val:+.3f}" + ("  (sig.)" if sig else "  (n.s.)")
+        ax.text(0.225, y, tag, va="center", ha="left", fontsize=12,
+                fontweight="bold", color=col)
+    ax.axvline(0, color=INK, lw=1.1, zorder=1)
+    ax.set_yticks(ys)
+    ax.set_yticklabels([r[0] for r in rows], fontsize=12.5, color=INK)
+    ax.set_xlim(-0.06, 0.42)
+    ax.set_xlabel("standardized coefficient", fontsize=11, color=GRAY)
+    for side in ("top", "right", "left"):
+        ax.spines[side].set_visible(False)
+    ax.spines["bottom"].set_color(GRAY)
+    ax.tick_params(colors=GRAY, left=False)
+    fig.subplots_adjust(left=0.32, right=0.95, top=0.95, bottom=0.16)
+    save(fig, "fig_p2_naive_reveal.png")
+
+
+# ============================================================ 6. reciprocal ties
+def fig_reciprocal_ties():
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.0))
+
+    for ax, kind in zip(axes, ("one_way", "mutual")):
+        ax.axis("off")
+        ax.set_xlim(-1.4, 1.4)
+        ax.set_ylim(-1.1, 1.3)
+        pA, pB = (-0.8, 0), (0.8, 0)
+        for p, name in zip((pA, pB), ("A", "B")):
+            ax.scatter(*p, s=1500, fc=BLUE, ec=INK, lw=1.4, zorder=3)
+            ax.text(*p, name, ha="center", va="center", fontsize=15,
+                    fontweight="bold", color="white", zorder=4)
+        if kind == "one_way":
+            ax.add_patch(FancyArrowPatch(pA, pB, arrowstyle="-|>", mutation_scale=22,
+                                          linewidth=2.6, color=GRAY,
+                                          connectionstyle="arc3,rad=0.0", zorder=2,
+                                          shrinkA=24, shrinkB=24))
+            ax.text(0, 0.55, "one-way “like”", ha="center", fontsize=13.5,
+                    fontweight="bold", color=INK)
+            ax.text(0, -0.75, "~73–75% of ties", ha="center", fontsize=12, color=GRAY)
+        else:
+            ax.add_patch(FancyArrowPatch(pA, pB, arrowstyle="-|>", mutation_scale=22,
+                                          linewidth=2.6, color=ORANGE,
+                                          connectionstyle="arc3,rad=0.25", zorder=2,
+                                          shrinkA=24, shrinkB=24))
+            ax.add_patch(FancyArrowPatch(pB, pA, arrowstyle="-|>", mutation_scale=22,
+                                          linewidth=2.6, color=ORANGE,
+                                          connectionstyle="arc3,rad=0.25", zorder=2,
+                                          shrinkA=24, shrinkB=24))
+            ax.text(0, 0.75, "mutual “like”", ha="center", fontsize=13.5,
+                    fontweight="bold", color=INK)
+            ax.text(0, -0.75, "~24–27% of ties — testing this next", ha="center",
+                    fontsize=12, color=ORANGE, fontweight="bold")
+
+    fig.subplots_adjust(left=0.02, right=0.98, top=0.95, bottom=0.05, wspace=0.05)
+    save(fig, "fig_p2_reciprocal_ties.png")
+
+
 if __name__ == "__main__":
     print("building P2 assets ...")
     fig_three_specs()
     fig_phi_compare()
     fig_gpa_gap()
+    fig_result1_arrows()
+    fig_naive_reveal()
+    fig_reciprocal_ties()
     print("done.")

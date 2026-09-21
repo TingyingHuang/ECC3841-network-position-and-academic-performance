@@ -121,9 +121,9 @@ def accent_bar(s, x, y, h, w=0.09, color=ORANGE):
     return r
 
 
-def figure(s, name, top=1.65, height=4.85, folder=A):
+def figure(s, name, top=1.65, height=4.85, folder=A, left=None):
     pic = s.shapes.add_picture(str(folder / name), 0, Inches(top), height=Inches(height))
-    pic.left = int((prs.slide_width - pic.width) / 2)
+    pic.left = Inches(left) if left is not None else int((prs.slide_width - pic.width) / 2)
     return pic
 
 
@@ -187,13 +187,14 @@ pagenum(s, 2)
 s = slide()
 eyebrow(s, "RESULT 1")
 title(s, "The replication holds")
-bullets(s, 0.7, 1.9, 11.9, 4.2, [
+bullets(s, 0.7, 2.0, 5.7, 4.2, [
     "A student's own past GPA strongly predicts their next GPA (coefficient 0.955).",
     "Once that's controlled, a friend's past GPA does not predict your future GPA — "
     "not significant (p = 0.557).",
     "New friendships show a smaller GPA gap than friendships about to end, in the "
     "university sample (p < 0.001); same direction in high school, not significant.",
-], size=17, gap=18)
+], size=15.5, gap=16)
+figure(s, "fig_p2_result1_arrows.png", top=1.95, height=4.15, left=6.7)
 takeaway(s, "Both match Smirnov & Thurner. This is the foundation everything else builds on.",
          kind="claim", top=6.6)
 pagenum(s, 3)
@@ -202,13 +203,14 @@ pagenum(s, 3)
 s = slide()
 eyebrow(s, "RESULT 2")
 title(s, "The naive effect is popularity, relabelled")
-bullets(s, 0.7, 1.9, 11.9, 3.5, [
+bullets(s, 0.7, 2.05, 5.7, 3.9, [
     "Katz-Bonacich alone, net of friend GPA: coefficient +0.093, p < 0.001. Looks like "
     "position matters.",
     "Add raw in-degree and out-degree to the same regression: the coefficient drops to "
     "−0.028, p = 0.446 — no longer significant.",
     "In-degree itself: +0.153, p < 0.001. That's what was driving the naive result.",
-], size=17, gap=18)
+], size=15.5, gap=18)
+figure(s, "fig_p2_naive_reveal.png", top=1.95, height=4.15, left=6.7)
 takeaway(s, "The naive effect was popularity wearing a different name.", kind="claim", top=6.6)
 pagenum(s, 4)
 
@@ -262,17 +264,18 @@ pagenum(s, 8)
 s = slide()
 eyebrow(s, "LIMITATIONS AND WHAT'S NEXT")
 title(s, "Where this is still open")
-bullets(s, 0.7, 1.9, 11.9, 4.4, [
+bullets(s, 0.7, 1.9, 11.9, 3.0, [
     "The corrected test has n = 2,088 from 535 students — a much wider confidence "
     "interval than the pooled test's 36,696.",
     "It can't be extended to the university cohorts: their GPA is a single measurement, "
     "not a time series.",
-    "Next: recompute centrality using only mutually-confirmed ties (the 24–27% that go "
-    "both ways) — testing directly whether weak, one-way \"likes\" are the reason we see "
-    "no effect.",
     "Betweenness and eigenvector centrality still need to go through the corrected, "
     "school-only design.",
-], size=16, gap=16)
+], size=16, gap=14)
+text(s, 0.7, 4.75, 11.9, 0.35,
+     "Next: recompute centrality using only mutually-confirmed ties, shown below.",
+     size=13, italic=True, color=GRAY)
+figure(s, "fig_p2_reciprocal_ties.png", top=5.1, height=1.95)
 pagenum(s, 9)
 
 # ===================================================== 10. thanks
