@@ -201,7 +201,7 @@ for i, (n, head, desc) in enumerate(steps):
     if i < len(steps) - 1:
         text(s, x + bw, 3.16, gap, 0.75, "→", size=20, bold=True, color=BORDER,
              align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-takeaway(s, "This brief reports what running that plan actually found.", kind="fact", top=6.6)
+takeaway(s, "Here's what actually happened when we ran it.", kind="fact", top=6.6)
 pagenum(s, 2)
 
 # ===================================================== 3. result 1
