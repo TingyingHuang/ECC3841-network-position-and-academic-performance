@@ -83,6 +83,25 @@ def bullets(s, left, top, width, height, items, size=16, color=DARK, gap=10):
     return box
 
 
+def stat_bullets(s, left, top, width, height, items, size=15, gap=16, lead_size=None):
+    """items: list of (lead, lead_color, rest) -- lead is the bolded, colored
+    number/stat; rest is the short plain-language phrase after it."""
+    lead_size = lead_size or size + 1
+    box = s.shapes.add_textbox(Inches(left), Inches(top), Inches(width), Inches(height))
+    tf = box.text_frame
+    tf.word_wrap = True
+    for i, (lead, lcolor, rest) in enumerate(items):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        p.space_after = Pt(gap)
+        p.line_spacing = 1.2
+        r1 = p.add_run(); r1.text = "  •  " + lead + "   "
+        r1.font.size = Pt(lead_size); r1.font.bold = True
+        r1.font.color.rgb = lcolor; r1.font.name = BODY
+        r2 = p.add_run(); r2.text = rest
+        r2.font.size = Pt(size); r2.font.color.rgb = DARK; r2.font.name = BODY
+    return box
+
+
 def eyebrow(s, t, color=ORANGE):
     text(s, 0.7, 0.42, 11.5, 0.4, t, size=13, bold=True, color=color)
 
@@ -162,10 +181,9 @@ text(s, 0.9, 6.5, 9, 0.5, "Amy Bing   ·   Tingying Huang", size=13, color=GRAY)
 s = slide()
 eyebrow(s, "WHERE WE LEFT OFF")
 title(s, "The plan from last time")
-text(s, 0.7, 1.75, 11.9, 0.9,
-     "Does a student's position in a friendship network predict their grades, on top of "
-     "popularity and who their direct friends are? The plan: measure Katz-Bonacich "
-     "centrality, sweep it across φ, and test it against that question.",
+text(s, 0.7, 1.75, 11.9, 0.7,
+     "Does network position predict grades, beyond popularity and direct friends? "
+     "Plan: Katz-Bonacich centrality, swept across φ.",
      size=16, color=GRAY, spacing=1.3)
 
 steps = [
@@ -180,6 +198,9 @@ for i, (n, head, desc) in enumerate(steps):
     box(s, x, 3.1, bw, 0.85, n, fc=ORANGE, tcolor=WHITE, size=20, bold=True)
     text(s, x, 4.1, bw, 0.5, head, size=15, bold=True, color=DARK, align=PP_ALIGN.CENTER)
     text(s, x, 4.6, bw, 1.4, desc, size=12.5, color=GRAY, align=PP_ALIGN.CENTER, spacing=1.25)
+    if i < len(steps) - 1:
+        text(s, x + bw, 3.16, gap, 0.75, "→", size=20, bold=True, color=BORDER,
+             align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 takeaway(s, "This brief reports what running that plan actually found.", kind="fact", top=6.6)
 pagenum(s, 2)
 
@@ -187,13 +208,12 @@ pagenum(s, 2)
 s = slide()
 eyebrow(s, "RESULT 1")
 title(s, "The replication holds")
-bullets(s, 0.7, 2.0, 5.7, 4.2, [
-    "A student's own past GPA strongly predicts their next GPA (coefficient 0.955).",
-    "Once that's controlled, a friend's past GPA does not predict your future GPA — "
-    "not significant (p = 0.557).",
-    "New friendships show a smaller GPA gap than friendships about to end, in the "
-    "university sample (p < 0.001); same direction in high school, not significant.",
-], size=15.5, gap=16)
+stat_bullets(s, 0.7, 2.1, 5.7, 4.0, [
+    ("0.955", GREEN, "own past GPA strongly predicts next GPA"),
+    ("p = 0.557", GRAY, "friend's past GPA — no effect"),
+    ("p < 0.001", DARK, "new friends more similar than friends about to leave "
+     "(university; not sig. in school)"),
+], size=14, gap=20)
 figure(s, "fig_p2_result1_arrows.png", top=1.95, height=4.15, left=6.7)
 takeaway(s, "Both match Smirnov & Thurner. This is the foundation everything else builds on.",
          kind="claim", top=6.6)
@@ -203,13 +223,11 @@ pagenum(s, 3)
 s = slide()
 eyebrow(s, "RESULT 2")
 title(s, "The naive effect is popularity, relabelled")
-bullets(s, 0.7, 2.05, 5.7, 3.9, [
-    "Katz-Bonacich alone, net of friend GPA: coefficient +0.093, p < 0.001. Looks like "
-    "position matters.",
-    "Add raw in-degree and out-degree to the same regression: the coefficient drops to "
-    "−0.028, p = 0.446 — no longer significant.",
-    "In-degree itself: +0.153, p < 0.001. That's what was driving the naive result.",
-], size=15.5, gap=18)
+stat_bullets(s, 0.7, 2.1, 5.7, 4.0, [
+    ("+0.093", GREEN, "Katz alone — looks like position matters"),
+    ("−0.028", GRAY, "add degree control — no longer significant"),
+    ("+0.153", GREEN, "in-degree alone — this was driving it"),
+], size=14, gap=20)
 figure(s, "fig_p2_naive_reveal.png", top=1.95, height=4.15, left=6.7)
 takeaway(s, "The naive effect was popularity wearing a different name.", kind="claim", top=6.6)
 pagenum(s, 4)
@@ -219,8 +237,8 @@ s = slide()
 eyebrow(s, "RESULT 3")
 title(s, "The planned test, and a gap we found in it")
 figure(s, "fig_p2_gpa_gap.png", top=1.55, height=4.35)
-takeaway(s, "Own past GPA can only be built for the school group — the other 80% of the "
-             "pooled sample can't have it.", kind="claim", top=6.35, height=0.85)
+takeaway(s, "Own past GPA only exists for the school group — 80% of the pooled sample can't have it.",
+         kind="claim", top=6.5, height=0.65)
 pagenum(s, 5)
 
 # ===================================================== 6. three specs
@@ -250,28 +268,29 @@ box(s, 0.7, 2.05, 11.9, 1.1,
     "Net of popularity, friend GPA, and a student's own past performance, we find no "
     "evidence that network position independently predicts grades.",
     fc=LGREEN, ec=GREEN, size=17, bold=True)
-bullets(s, 0.7, 3.45, 11.9, 3.3, [
-    "This is the first time this claim has been tested with a real time lag and an "
-    "own-performance control — a cross-section could never support that.",
-    "It shows a general risk: pooling groups with different data structures can "
-    "manufacture a significant coefficient the correctly specified subsample doesn't support.",
-    "It's a decision-relevant answer: interventions built around widening students' "
-    "network reach aren't supported by this data once the obvious confounds are handled.",
-], size=15.5, gap=14)
+
+why = [
+    ("1st", "First real test", "Time lag + own-performance control — a cross-section couldn't support this."),
+    ("!", "A general risk", "Pooling mismatched data structures can manufacture a false-positive coefficient."),
+    ("→", "Decision-relevant", "Network-reach interventions aren't supported once confounds are controlled."),
+]
+x0, bw, gap = 0.7, 3.75, 0.35
+for i, (badge, head, cap) in enumerate(why):
+    x = x0 + i * (bw + gap)
+    box(s, x, 3.55, bw, 0.65, badge, fc=GREEN, tcolor=WHITE, size=17, bold=True)
+    text(s, x, 4.35, bw, 0.4, head, size=15, bold=True, color=DARK, align=PP_ALIGN.CENTER)
+    text(s, x, 4.8, bw, 1.6, cap, size=12.5, color=GRAY, align=PP_ALIGN.CENTER, spacing=1.25)
 pagenum(s, 8)
 
 # ===================================================== 9. limitations / next
 s = slide()
 eyebrow(s, "LIMITATIONS AND WHAT'S NEXT")
 title(s, "Where this is still open")
-bullets(s, 0.7, 1.9, 11.9, 3.0, [
-    "The corrected test has n = 2,088 from 535 students — a much wider confidence "
-    "interval than the pooled test's 36,696.",
-    "It can't be extended to the university cohorts: their GPA is a single measurement, "
-    "not a time series.",
-    "Betweenness and eigenvector centrality still need to go through the corrected, "
-    "school-only design.",
-], size=16, gap=14)
+stat_bullets(s, 0.7, 1.95, 11.9, 2.6, [
+    ("n = 2,088", DARK, "535 students — a much wider CI than the pooled 36,696"),
+    ("static GPA", GRAY, "can't extend to university cohorts — no time series there"),
+    ("not yet run", GRAY, "betweenness / eigenvector centrality under the corrected design"),
+], size=15, gap=14)
 text(s, 0.7, 4.75, 11.9, 0.35,
      "Next: recompute centrality using only mutually-confirmed ties, shown below.",
      size=13, italic=True, color=GRAY)
