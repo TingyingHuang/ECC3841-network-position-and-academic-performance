@@ -44,11 +44,21 @@ ECC3841 project/
 │   ├── final_*.txt / .csv                 ← the numbers actually reported in the PDF (from 04)
 │   └── alpha_sweep_chart.html             ← interactive chart of the α decomposition
 │
-└── slides/                                ← Presentation 1 deck
-    ├── Presentation1.pdf                  ← current deck, exported
-    ├── build_visual_deck.py               ← regenerates the deck from the figures below
+└── slides/
+    ├── ECC3841 Presentation 1.pdf         ← Presentation 1, exported
+    ├── build_visual_deck.py               ← regenerates the P1 deck from assets/
     ├── build_assets_visual.py             ← regenerates every figure in assets/
-    └── assets/                            ← figures used by the deck (fig_*.png + decor_network.png)
+    ├── assets/                            ← P1 figures (fig_*.png + decor_network.png)
+    ├── Presentation2.pptx                 ← Presentation 2 deck (python-pptx)
+    ├── build_presentation2_deck.py        ← regenerates Presentation2.pptx from assets_p2/
+    ├── build_assets_p2.py                 ← regenerates every figure in assets_p2/
+    ├── assets_p2/                         ← P2 figures
+    └── beamer_p2/                         ← Presentation 2, alternate Beamer/LaTeX version
+        ├── talk.tex, talk.pdf             ← the deck (econ-slides skill, 10-min progress-report format)
+        ├── script.tex, script.pdf         ← timed speaker script + conditional Q&A appendix
+        ├── results.tex                    ← shared title/result macros for talk.tex + script.tex
+        ├── structure-plan.md              ← claim-evidence ledger and frame plan behind the deck
+        └── figures/                       ← copies of the assets_p2/ exhibits it reuses
 ```
 
 ---
