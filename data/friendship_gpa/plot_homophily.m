@@ -1,3 +1,10 @@
+% ---------------------------------------------------------------------
+% Original authors' code, included for reference only. Not modified,
+% not used by our own pipeline (see scripts/friendship_gpa/*.py).
+% Source: Smirnov, I., & Thurner, S. (2017). PLOS ONE, 12(8): e0183473.
+% Data & code: Harvard Dataverse, doi:10.7910/DVN/SZA9YW (CC0 1.0).
+% See ../SOURCE.md for the full citation and licence.
+% ---------------------------------------------------------------------
 %% Load data and compute homophily index
 clear all;
 load('data.mat');

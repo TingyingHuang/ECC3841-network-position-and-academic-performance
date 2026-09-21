@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# third-party papers kept for our own reading; not ours to publish
+references/

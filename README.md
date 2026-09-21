@@ -21,6 +21,7 @@ ECC3841 project/
 ├── Network_Economics_Course_Project_Guide.pdf   ← course-supplied assignment brief
 │
 ├── data/friendship_gpa/                   ← raw input data (untouched, as downloaded)
+│   ├── SOURCE.md                          ← full citation + licence for everything in this folder
 │   ├── data.mat                           ← the actual dataset: networks + GPA
 │   ├── getHomophily.m                     ← original authors' MATLAB code (reference only)
 │   ├── model.m                            ← original authors' MATLAB code (reference only)
@@ -33,15 +34,21 @@ ECC3841 project/
 │   ├── 03_centrality_robustness.py
 │   └── 04_final_synthesis.py
 │
-└── output/friendship_gpa/                 ← everything the scripts produce
-    ├── panel_long.csv                     ← main dataset (from 01)
-    ├── panel_long_extended.csv            ← + betweenness/eigenvector (from 03)
-    ├── robustness_alpha_sweep_raw.csv     ← every student × every α level (from 03, large file)
-    ├── layer1_*.txt / .csv                ← replication of the original paper (from 02)
-    ├── layer2_*.txt / layer3_*.txt        ← first (naive) centrality regressions (from 02)
-    ├── robustness_*.txt / .csv            ← horse-race + α-sweep robustness checks (from 03)
-    ├── final_*.txt / .csv                 ← the numbers actually reported in the PDF (from 04)
-    └── alpha_sweep_chart.html             ← interactive chart of the α decomposition
+├── output/friendship_gpa/                 ← everything the scripts produce
+│   ├── panel_long.csv                     ← main dataset (from 01)
+│   ├── panel_long_extended.csv            ← + betweenness/eigenvector (from 03)
+│   ├── robustness_alpha_sweep_raw.csv     ← every student × every α level (from 03, large file)
+│   ├── layer1_*.txt / .csv                ← replication of the original paper (from 02)
+│   ├── layer2_*.txt / layer3_*.txt        ← first (naive) centrality regressions (from 02)
+│   ├── robustness_*.txt / .csv            ← horse-race + α-sweep robustness checks (from 03)
+│   ├── final_*.txt / .csv                 ← the numbers actually reported in the PDF (from 04)
+│   └── alpha_sweep_chart.html             ← interactive chart of the α decomposition
+│
+└── slides/                                ← Presentation 1 deck
+    ├── Presentation1.pdf                  ← current deck, exported
+    ├── build_visual_deck.py               ← regenerates the deck from the figures below
+    ├── build_assets_visual.py             ← regenerates every figure in assets/
+    └── assets/                            ← figures used by the deck (fig_*.png + decor_network.png)
 ```
 
 ---
