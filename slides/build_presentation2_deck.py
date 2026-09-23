@@ -173,24 +173,24 @@ text(s, 0.9, 2.0, 11.5, 0.5, "ECC3841 NETWORK ECONOMICS  ·  PRESENTATION 2",
      size=13, bold=True, color=ORANGE)
 text(s, 0.9, 2.55, 11.5, 1.9, "Network Position and\nAcademic Performance",
      size=42, bold=True, color=DARK, font=HEAD, spacing=1.05)
-text(s, 0.9, 4.65, 11.2, 1.0, "What we found so far — a progress report",
+text(s, 0.9, 4.65, 11.2, 1.0, "Progress report: an initial result, then a model correction",
      size=20, color=GRAY, italic=True)
 text(s, 0.9, 6.5, 9, 0.5, "Amy Bing   ·   Tingying Huang", size=13, color=GRAY)
 
 # ===================================================== 2. recap + what we did
 s = slide()
-eyebrow(s, "WHERE WE LEFT OFF")
-title(s, "The plan from last time")
+eyebrow(s, "RESEARCH PROGRESS")
+title(s, "How the analysis changed")
 text(s, 0.7, 1.75, 11.9, 0.7,
-     "Does network position predict grades, beyond popularity and direct friends? "
-     "Plan: Katz-Bonacich centrality, swept across φ.",
+     "Our question remains: does outgoing network reach predict later grades beyond prior GPA and direct contacts? "
+     "The important progress was discovering which data can answer it.",
      size=16, color=GRAY, spacing=1.3)
 
 steps = [
-    ("1", "Replicate", "Confirm the data behaves\nthe way prior work found."),
-    ("2", "Naive test", "Position alone,\nno popularity control."),
-    ("3", "Planned test", "Add popularity, sweep φ,\npool all 5 groups."),
-    ("4", "Check + fix", "Test the assumptions.\nFound one had failed."),
+    ("1", "Replicate", "Confirm known GPA\nand tie patterns."),
+    ("2", "Initial result", "Estimate a pooled\nKatz--GPA association."),
+    ("3", "Audit", "Check time order and\nwhat each cohort records."),
+    ("4", "Corrected test", "Use the school panel\nwith prior GPA."),
 ]
 x0, bw, gap = 0.7, 2.85, 0.28
 for i, (n, head, desc) in enumerate(steps):
@@ -198,10 +198,7 @@ for i, (n, head, desc) in enumerate(steps):
     box(s, x, 3.1, bw, 0.85, n, fc=ORANGE, tcolor=WHITE, size=20, bold=True)
     text(s, x, 4.1, bw, 0.5, head, size=15, bold=True, color=DARK, align=PP_ALIGN.CENTER)
     text(s, x, 4.6, bw, 1.4, desc, size=12.5, color=GRAY, align=PP_ALIGN.CENTER, spacing=1.25)
-    if i < len(steps) - 1:
-        text(s, x + bw, 3.16, gap, 0.75, "→", size=20, bold=True, color=BORDER,
-             align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-takeaway(s, "Here's what actually happened when we ran it.", kind="fact", top=6.6)
+takeaway(s, "The presentation reports the correction as part of the research process.", kind="fact", top=6.6)
 pagenum(s, 2)
 
 # ===================================================== 3. result 1
@@ -221,58 +218,58 @@ pagenum(s, 3)
 
 # ===================================================== 4. result 2 (naive)
 s = slide()
-eyebrow(s, "RESULT 2")
-title(s, "The naive effect is popularity, relabelled")
+eyebrow(s, "INITIAL RESULT")
+title(s, "The first pooled result looked significant")
 stat_bullets(s, 0.7, 2.1, 5.7, 4.0, [
-    ("+0.093", GREEN, "Katz alone — looks like position matters"),
-    ("−0.028", GRAY, "add degree control — no longer significant"),
-    ("+0.153", GREEN, "in-degree alone — this was driving it"),
+    ("+0.089", GREEN, "Katz alone: a positive pooled GPA association"),
+    ("+0.012", GRAY, "after direct-degree controls"),
+    ("p = 0.760", GRAY, "the adjusted Katz estimate is not significant"),
 ], size=14, gap=20)
 figure(s, "fig_p2_naive_reveal.png", top=1.95, height=4.15, left=6.7)
-takeaway(s, "The naive effect was popularity wearing a different name.", kind="claim", top=6.6)
+takeaway(s, "This was a useful signal, but it was not yet a valid test of later academic performance.", kind="claim", top=6.6)
 pagenum(s, 4)
 
 # ===================================================== 5. the gap we found
 s = slide()
-eyebrow(s, "RESULT 3")
-title(s, "The planned test, and a gap we found in it")
+eyebrow(s, "MODEL AUDIT")
+title(s, "The pooled university comparison cannot identify a later-GPA effect")
 figure(s, "fig_p2_gpa_gap.png", top=1.55, height=4.35)
-takeaway(s, "Own past GPA only exists for the school group — 80% of the pooled sample can't have it.",
+takeaway(s, "University GPA is static: it cannot control baseline achievement or establish time order. Only school GPA repeats over time.",
          kind="claim", top=6.5, height=0.65)
 pagenum(s, 5)
 
 # ===================================================== 6. three specs
 s = slide()
-eyebrow(s, "COMPARING THE THREE TESTS")
-title(s, "Three specifications, three different pictures")
+eyebrow(s, "CORRECTED PRIMARY TEST")
+title(s, "After correcting the model, the effect is no longer significant")
 figure(s, "fig_p2_three_specs.png", top=1.55, height=4.65)
-takeaway(s, "The corrected test — the only one with own past GPA properly controlled — finds nothing.",
+takeaway(s, "School panel model: later GPA on prior GPA, outgoing Katz, direct links, contact GPA, and time effects. Katz = +0.009, p = 0.139.",
          kind="fact", top=6.35, height=0.7)
 pagenum(s, 6)
 
 # ===================================================== 7. phi sweep compare
 s = slide()
 eyebrow(s, "ROBUSTNESS")
-title(s, "Checked across the whole φ range, not just one value")
+title(s, "The school result remains non-significant across the φ range")
 figure(s, "fig_p2_phi_compare.png", top=1.55, height=4.65)
-takeaway(s, "Before the fix, the line swings from significantly positive to significantly "
-             "negative. After it, it's flat.", kind="fact", top=6.35, height=0.7)
+takeaway(s, "Pooled results change with φ; the lagged school estimates are positive but never significant.",
+         kind="fact", top=6.35, height=0.7)
 pagenum(s, 7)
 
 # ===================================================== 8. conclusion
 s = slide()
-eyebrow(s, "CONCLUSION")
-title(s, "What this means")
+eyebrow(s, "PRESENTATION 2 CONCLUSION")
+title(s, "What we can conclude at this stage")
 pill(s, 0.7, 1.68, "HEADLINE FINDING", fc=GREEN)
 box(s, 0.7, 2.05, 11.9, 1.1,
-    "Net of popularity, friend GPA, and a student's own past performance, we find no "
-    "evidence that network position independently predicts grades.",
+    "The initial association did not survive the model audit. In the usable longitudinal sample, "
+    "we find no statistically significant evidence that outgoing network reach predicts later grades.",
     fc=LGREEN, ec=GREEN, size=17, bold=True)
 
 why = [
-    ("1st", "First real test", "Time lag + own-performance control — a cross-section couldn't support this."),
-    ("!", "A general risk", "Pooling mismatched data structures can manufacture a false-positive coefficient."),
-    ("→", "Decision-relevant", "Network-reach interventions aren't supported once confounds are controlled."),
+    ("t+1", "Time order", "The primary model predicts later GPA from the earlier network."),
+    ("!", "Interpretation", "The university association remains descriptive, not causal."),
+    ("P3", "Next step", "We will analyse incentives and mechanisms before making recommendations."),
 ]
 x0, bw, gap = 0.7, 3.75, 0.35
 for i, (badge, head, cap) in enumerate(why):
@@ -284,15 +281,15 @@ pagenum(s, 8)
 
 # ===================================================== 9. limitations / next
 s = slide()
-eyebrow(s, "LIMITATIONS AND WHAT'S NEXT")
-title(s, "Where this is still open")
+eyebrow(s, "PRESENTATION 3 SCOPE")
+title(s, "Questions reserved for the final presentation")
 stat_bullets(s, 0.7, 1.95, 11.9, 2.6, [
-    ("n = 2,088", DARK, "535 students — a much wider CI than the pooled 36,696"),
-    ("static GPA", GRAY, "can't extend to university cohorts — no time series there"),
-    ("not yet run", GRAY, "betweenness / eigenvector centrality under the corrected design"),
+    ("Mechanism", DARK, "Why might students form academically useful links, and when would indirect reach matter?"),
+    ("Incentives", GRAY, "Use a network-economics model to analyse link formation, information access, and peer effects."),
+    ("Decision", GRAY, "Translate the final evidence into a cautious recommendation for a non-expert manager."),
 ], size=15, gap=14)
 text(s, 0.7, 4.75, 11.9, 0.35,
-     "Next: recompute centrality using only mutually-confirmed ties, shown below.",
+     "Before then, the remaining empirical checks are incoming status and reciprocal ties; neither is significant in the current robustness results.",
      size=13, italic=True, color=GRAY)
 figure(s, "fig_p2_reciprocal_ties.png", top=5.1, height=1.95)
 pagenum(s, 9)
@@ -305,7 +302,7 @@ dec.left = int(prs.slide_width - dec.width - Inches(0.5))
 accent_bar(s, 0.55, 2.63, 0.95)
 text(s, 0.9, 2.6, 11, 1.2, "Thank you", size=42, bold=True, color=DARK, font=HEAD)
 text(s, 0.95, 4.0, 11, 0.6,
-     "Full numbers and setup: research_brief.pdf and progress_brief.pdf.", size=15, color=GRAY)
+     "Presentation 3: network incentives, mechanism, and final recommendation.", size=15, color=GRAY)
 text(s, 0.95, 6.4, 6, 0.5, "Questions?", size=16, bold=True, color=ORANGE)
 pagenum(s, 10)
 

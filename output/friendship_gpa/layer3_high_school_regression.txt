@@ -3,26 +3,26 @@ SEs clustered by student.
 
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:                    gpa   R-squared:                       0.095
-Model:                            OLS   Adj. R-squared:                  0.094
-Method:                 Least Squares   F-statistic:                     60.26
-Date:                Wed, 02 Sep 2026   Prob (F-statistic):           2.20e-24
-Time:                        00:33:37   Log-Likelihood:                -1975.6
-No. Observations:                2532   AIC:                             3957.
-Df Residuals:                    2529   BIC:                             3975.
+Dep. Variable:                    gpa   R-squared:                       0.103
+Model:                            OLS   Adj. R-squared:                  0.102
+Method:                 Least Squares   F-statistic:                     65.41
+Date:                Wed, 23 Sep 2026   Prob (F-statistic):           3.30e-26
+Time:                        14:09:33   Log-Likelihood:                -1964.8
+No. Observations:                2532   AIC:                             3936.
+Df Residuals:                    2529   BIC:                             3953.
 Df Model:                           2                                         
 Covariance Type:              cluster                                         
 ==================================================================================
                      coef    std err          z      P>|z|      [0.025      0.975]
 ----------------------------------------------------------------------------------
-Intercept          2.1004      0.163     12.903      0.000       1.781       2.419
-katz_z             0.0172      0.021      0.824      0.410      -0.024       0.058
-avg_friend_gpa     0.4543      0.042     10.946      0.000       0.373       0.536
+Intercept          2.1143      0.163     13.005      0.000       1.796       2.433
+katz_z             0.0517      0.020      2.537      0.011       0.012       0.092
+avg_friend_gpa     0.4507      0.041     10.908      0.000       0.370       0.532
 ==============================================================================
-Omnibus:                      133.947   Durbin-Watson:                   1.834
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):               64.287
-Skew:                           0.194   Prob(JB):                     1.10e-14
-Kurtosis:                       2.322   Cond. No.                         43.8
+Omnibus:                      128.416   Durbin-Watson:                   1.849
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               62.899
+Skew:                           0.194   Prob(JB):                     2.20e-14
+Kurtosis:                       2.332   Cond. No.                         43.8
 ==============================================================================
 
 Notes:

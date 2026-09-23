@@ -21,15 +21,15 @@
 
 \section*{Introduction}
 
-A student's grades depend on effort and ability. They also depend on the student's
-friends. A friendship network gives access to information, advice, study partners, and
+A student's grades depend on effort and ability. They may also depend on the students
+they choose to connect with online. A social network gives access to information, advice, study partners, and
 motivation. So where a student sits in the network may matter for grades. We ask
 whether it does.
 
 \section*{Research question}
 
-Does a student's position in a friendship network affect their grades, on top of who
-their direct friends are?
+In a directed student ``like'' network, does a student's outgoing network reach predict
+their next-period grades, beyond past GPA and direct contacts?
 
 \section*{Background}
 
@@ -47,9 +47,10 @@ centrality}, a measure of network position. On US data, more central students do
 in school. But their data are one snapshot in time. So they cannot tell whether
 position raises grades, or good grades just attract more friends.
 
-We combine the two. We take the centrality prediction to Smirnov and Thurner's data,
-which covers many time points, and test it while holding friend-group GPA and past GPA
-fixed.
+We combine the two. The high-school cohort supplies six genuine GPA measurements per
+student, so it can test whether centrality at time $t$ predicts GPA at $t+1$ while
+holding past GPA and direct-contact composition fixed. The university cohorts have a
+single static GPA measurement and are used only for descriptive comparisons.
 
 \section*{The model}
 
@@ -58,8 +59,8 @@ Each student $i$ picks study effort $x_i$. Their payoff is
 u_i = a\,x_i \;-\; \tfrac{1}{2}x_i^{2} \;+\; \phi \sum_{j} g_{ij}\,x_i x_j .
 \]
 The first term is the gain from effort. The second is its rising cost. The third is the
-social part: $g_{ij}=1$ if $i$ and $j$ are friends, and $\phi>0$ means a friend
-studying more raises $i$'s own reward from studying.
+social part: $g_{ij}=1$ if student $i$ liked student $j$, and $\phi>0$ means that
+the effort of a student whom $i$ chose to connect with raises $i$'s return to effort.
 
 Setting the derivative to zero gives each student's best choice:
 \[
@@ -83,8 +84,8 @@ less.
 
 $\phi$ sets how far influence spreads through the network.
 \begin{itemize}
-  \item Small $\phi$: only direct friends count. Centrality is almost the same as
-        \emph{popularity} (in-degree).
+  \item Small $\phi$: only direct contacts count. Centrality is almost the same as
+        outgoing degree.
   \item Large $\phi$ (near its ceiling): distant links count almost as much as close
         ones. Centrality now measures \emph{reach} --- being a bridge between many
         groups.
@@ -100,21 +101,21 @@ the same thing in every network, and results can be compared.
 
 \section*{Empirical strategy}
 
-For each network we compute centrality at each $c$, then run
+For the high-school network, we compute centrality at each $c$, then run
 \[
 \begin{aligned}
 \mathrm{GPA}_{i,\,t+1} = {}& \beta_0 + \beta_1\,\mathrm{Katz}_{i,t}
   + \beta_2\,\mathrm{GPA}_{i,t}
-  + \beta_3\,\overline{\mathrm{GPA}}^{\,\text{friends}}_{i,t} \\[2pt]
+  + \beta_3\,\overline{\mathrm{GPA}}^{\,\text{contacts}}_{i,t} \\[2pt]
   & {} + \beta_4\,\mathrm{InDeg}_{i,t} + \beta_5\,\mathrm{OutDeg}_{i,t}
-  + \gamma_{\text{group}} + \varepsilon_{i,t}.
+  + \gamma_t + \varepsilon_{i,t}.
 \end{aligned}
 \]
-Each control has a job. Average friend GPA is Smirnov and Thurner's variable, so
-$\beta_1$ is net of friend-group composition. In- and out-degree are raw popularity, so
-$\beta_1$ is net of that too. The real question is whether centrality adds anything
-beyond counting friends. We run this at every $c$. One test, at $c = 0.85$, is fixed in
-advance as the headline. We also try betweenness and eigenvector centrality.
+Each control has a job. Average contact GPA is Smirnov and Thurner's variable, so
+$\beta_1$ is net of contact composition. In- and out-degree are direct-link controls,
+so $\beta_1$ is net of them too. The real question is whether indirect reach adds
+anything beyond direct contacts. We run this at every $c$, using $c = 0.85$ as the
+primary specification, and check incoming status and reciprocal ties as alternatives.
 
 \section*{Which way does the arrow run?}
 
@@ -124,9 +125,9 @@ data help in three ways:
   \item \textbf{Time order.} Position is measured before the GPA it predicts.
   \item \textbf{Past GPA is controlled.} We compare students who currently have the same
         grade.
-  \item \textbf{Panel data.} We can remove fixed traits (ability, background) with
-        student fixed effects, and we can measure the reverse arrow directly: does a
-        rise in GPA bring new friends?
+  \item \textbf{Panel data in high school.} The main test uses the high-school
+        panel. The university cohorts cannot provide this timing check because their
+        GPA is static.
 \end{enumerate}
 What we still cannot rule out: something that changes a student mid-term and lifts both
 grades and friend count. ``Likes'' are also a rough stand-in for real friendship. So
@@ -141,7 +142,7 @@ along the $\phi$ dial.
 
 \textbf{Reading the sign of $\beta_1$:}
 \begin{itemize}
-  \item $\beta_1 > 0$: central students gain from more access to information and help.
+  \item $\beta_1 > 0$: students with greater outgoing reach gain from more access to information and help.
   \item $\beta_1 = 0$: the gains and the time costs cancel.
   \item $\beta_1 < 0$: wide reach costs study time.
 \end{itemize}

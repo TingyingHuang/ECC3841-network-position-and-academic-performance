@@ -43,9 +43,9 @@ def save(fig, name):
 # ============================================================ 1. three specs
 def fig_three_specs():
     specs = [
-        ("Naive\n(no popularity control)", 0.093, 0.012, True, "+0.093"),
-        ("Pooled headline\n(all 5 groups, no own-GPA)", -0.0415, 0.019, True, "−0.0415"),
-        ("Corrected\n(school only, own-GPA in)", 0.0046, 0.006, False, "+0.0046"),
+        ("Pooled, no degree\n(descriptive)", 0.0890, 0.0130, True, "+0.089"),
+        ("Pooled + degree\n(descriptive)", 0.0116, 0.0380, False, "+0.012"),
+        ("School, lagged GPA\n(primary test)", 0.0093, 0.0063, False, "+0.009"),
     ]
     fig, ax = plt.subplots(figsize=(11, 5.6))
     ax.axhline(0, color=GRAY, lw=1.2, zorder=1)
@@ -69,7 +69,7 @@ def fig_three_specs():
     ax.spines["left"].set_color(GRAY)
     ax.spines["bottom"].set_color(GRAY)
     ax.tick_params(colors=GRAY)
-    ax.set_title("Three specifications, three different pictures",
+    ax.set_title("The Katz association becomes non-significant in stronger specifications",
                  fontsize=15, fontweight="bold", color=INK, pad=14)
     fig.subplots_adjust(left=0.12, right=0.97, top=0.88, bottom=0.14)
     save(fig, "fig_p2_three_specs.png")
@@ -78,20 +78,20 @@ def fig_three_specs():
 # ============================================================ 2. phi compare
 def fig_phi_compare():
     fracs = [0.05, 0.20, 0.40, 0.60, 0.80, 0.95]
-    pooled = [0.0820, 0.0216, -0.0344, -0.0513, -0.0477, -0.0356]
-    pooled_p = [0.012, 0.598, 0.407, 0.115, 0.031, 0.011]
-    school = [-0.0042, -0.0019, 0.0009, 0.0029, 0.0044, 0.0048]
-    school_p = [0.62, 0.84, 0.93, 0.74, 0.51, 0.36]
+    pooled = [0.1025, 0.0923, 0.0536, 0.0239, 0.0070, 0.0010]
+    pooled_p = [0.0003, 0.022, 0.214, 0.485, 0.767, 0.946]
+    school = [0.0060, 0.0152, 0.0183, 0.0148, 0.0103, 0.0070]
+    school_p = [0.577, 0.173, 0.088, 0.098, 0.129, 0.178]
 
     fig, ax = plt.subplots(figsize=(11, 5.8))
     ax.axhline(0, color=GRAY, lw=1.1, zorder=1)
 
-    ax.plot(fracs, pooled, color=ORANGE, lw=2.2, zorder=2, label="Pooled, all 5 groups (no own-GPA control)")
+    ax.plot(fracs, pooled, color=ORANGE, lw=2.2, zorder=2, label="Pooled, all 5 groups (descriptive only)")
     for f, v, p in zip(fracs, pooled, pooled_p):
         ax.scatter([f], [v], s=110, facecolors=(ORANGE if p < 0.05 else "white"),
                    edgecolors=ORANGE, linewidths=2, zorder=4)
 
-    ax.plot(fracs, school, color=BLUE, lw=2.2, zorder=2, label="School only, own-GPA controlled")
+    ax.plot(fracs, school, color=BLUE, lw=2.2, zorder=2, label="School only, lagged GPA controlled")
     for f, v, p in zip(fracs, school, school_p):
         ax.scatter([f], [v], s=110, facecolors=(BLUE if p < 0.05 else "white"),
                    edgecolors=BLUE, linewidths=2, zorder=4)
@@ -105,7 +105,7 @@ def fig_phi_compare():
     ax.spines["bottom"].set_color(GRAY)
     ax.tick_params(colors=GRAY)
     ax.legend(loc="lower left", frameon=False, fontsize=11.5)
-    ax.set_title("Filled marker = significant at 5%.  Once own past GPA is controlled, the line goes flat.",
+    ax.set_title("Filled marker = significant at 5%. The longitudinal school estimates are all non-significant.",
                  fontsize=13, color=INK, pad=12)
     fig.subplots_adjust(left=0.11, right=0.97, top=0.88, bottom=0.13)
     save(fig, "fig_p2_phi_compare.png")
@@ -178,9 +178,9 @@ def fig_result1_arrows():
 # ============================================================ 5. naive reveal
 def fig_naive_reveal():
     rows = [
-        ("In-degree itself", 0.153, True),
-        ("Katz + degree control", -0.028, False),
-        ("Katz-Bonacich alone", 0.093, True),
+        ("In-degree, with controls", 0.122, True),
+        ("Katz + degree control", 0.012, False),
+        ("Katz-Bonacich alone", 0.089, True),
     ]
     fig, ax = plt.subplots(figsize=(6.6, 4.4))
     ys = np.arange(len(rows))
@@ -235,7 +235,7 @@ def fig_reciprocal_ties():
                                           shrinkA=24, shrinkB=24))
             ax.text(0, 0.75, "mutual “like”", ha="center", fontsize=13.5,
                     fontweight="bold", color=INK)
-            ax.text(0, -0.75, "~24–27% of ties — testing this next", ha="center",
+            ax.text(0, -0.75, "~24–27% of ties — robustness check completed", ha="center",
                     fontsize=12, color=ORANGE, fontweight="bold")
 
     fig.subplots_adjust(left=0.02, right=0.98, top=0.95, bottom=0.05, wspace=0.05)

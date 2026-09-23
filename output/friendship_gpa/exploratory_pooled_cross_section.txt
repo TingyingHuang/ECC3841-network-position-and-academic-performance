@@ -1,0 +1,36 @@
+EXPLORATORY POOLED CROSS-SECTION
+gpa ~ katz_z + indeg_z + outdeg_z + avg_friend_gpa + C(group)
+Not a t -> t+1 model: university GPA is static and repeated over snapshots. SEs clustered by student.
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                    gpa   R-squared:                       0.446
+Model:                            OLS   Adj. R-squared:                  0.446
+Method:                 Least Squares   F-statistic:                     2146.
+Date:                Wed, 23 Sep 2026   Prob (F-statistic):               0.00
+Time:                        14:11:16   Log-Likelihood:                -54227.
+No. Observations:               36696   AIC:                         1.085e+05
+Df Residuals:                   36687   BIC:                         1.085e+05
+Df Model:                           8                                         
+Covariance Type:              cluster                                         
+==========================================================================================
+                             coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------------------
+Intercept                  3.8112      0.132     28.843      0.000       3.552       4.070
+C(group)[T.juniors]       -0.1021      0.040     -2.557      0.011      -0.180      -0.024
+C(group)[T.school]        -1.7935      0.071    -25.297      0.000      -1.932      -1.655
+C(group)[T.seniors]        0.0300      0.041      0.738      0.461      -0.050       0.110
+C(group)[T.sophomores]    -0.1799      0.037     -4.808      0.000      -0.253      -0.107
+katz_z                     0.0043      0.021      0.208      0.835      -0.036       0.045
+indeg_z                    0.0893      0.013      6.958      0.000       0.064       0.114
+outdeg_z                   0.0575      0.022      2.655      0.008       0.015       0.100
+avg_friend_gpa             0.4754      0.017     27.674      0.000       0.442       0.509
+==============================================================================
+Omnibus:                      355.181   Durbin-Watson:                   1.910
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              365.446
+Skew:                          -0.244   Prob(JB):                     4.41e-80
+Kurtosis:                       3.005   Cond. No.                         96.6
+==============================================================================
+
+Notes:
+[1] Standard Errors are robust to cluster correlation (CRV1)

@@ -1,21 +1,19 @@
 """
-Final synthesis script. Consolidates every check that shaped the project's
-actual conclusion (several of which were originally run as one-off snippets
-during exploration) into one reproducible script:
+Supplementary synthesis script. It consolidates descriptive checks that are useful
+for context, but do not identify a next-period GPA effect for the pooled sample:
 
   A. Replicate Smirnov & Thurner's own headline statistic (the Homophily
      Index: Pearson r between own GPA and average friend GPA) directly from
      getHomophily.m's formula, on the same data -- gives an apples-to-apples
      benchmark for how large *their* effect is.
 
-  B. THE PRE-SPECIFIED HEADLINE TEST. This is the one regression we treat as
-     confirmatory: pooled sample, the baseline Katz-Bonacich centrality
+  B. A pooled, contemporaneous cross-sectional regression using the baseline
+     Katz-Bonacich centrality. This is exploratory, not confirmatory, because
+     university GPA is static and cannot be lagged or controlled by a prior GPA.
      computed in step 01 (alpha = 0.85 / lambda_max -- chosen when the panel
      was first built, before any alpha-sweep exploration), horse-raced
      against raw in/out-degree AND against avg_friend_gpa (Smirnov &
      Thurner's own selection-channel variable) plus cohort fixed effects.
-     Because this specification was fixed before the alpha sweep existed,
-     it is not subject to a look-elsewhere/multiple-comparisons critique.
 
   C/D. The alpha-sweep heterogeneity breakdown, by level (high_school vs
      university) and by the 5 individual cohorts -- exploratory /
@@ -89,10 +87,10 @@ def replicate_homophily_index(mat):
 
 
 # ---------------------------------------------------------------------------
-# B. Pre-specified headline test
+# B. Exploratory pooled cross-sectional test
 # ---------------------------------------------------------------------------
-def headline_test(panel: pd.DataFrame):
-    log("B. HEADLINE TEST (pre-specified, alpha=0.85 baseline, pooled)")
+def exploratory_pooled_test(panel: pd.DataFrame):
+    log("B. EXPLORATORY POOLED CROSS-SECTION (not a lagged outcome model)")
     reg = panel.dropna(
         subset=["gpa", "katz_centrality", "avg_friend_gpa", "in_degree", "out_degree"]
     ).copy()
@@ -104,16 +102,16 @@ def headline_test(panel: pd.DataFrame):
         "gpa ~ katz_z + indeg_z + outdeg_z + avg_friend_gpa + C(group)", data=reg
     ).fit(cov_type="cluster", cov_kwds={"groups": reg["student_id"]})
     print(m.summary())
-    with open(OUT / "final_headline_test.txt", "w") as f:
+    with open(OUT / "exploratory_pooled_cross_section.txt", "w") as f:
         f.write(
-            "HEADLINE TEST (pre-specified before any alpha-sweep exploration)\n"
+            "EXPLORATORY POOLED CROSS-SECTION\n"
             "gpa ~ katz_z + indeg_z + outdeg_z + avg_friend_gpa + C(group)\n"
-            "alpha = 0.85 / lambda_max (baseline choice from step 01, not "
-            "selected post-hoc from the sweep). SEs clustered by student.\n\n"
+            "Not a t -> t+1 model: university GPA is static and repeated over snapshots. "
+            "SEs clustered by student.\n\n"
         )
         f.write(m.summary().as_text())
     log(f"  katz_z coef = {m.params['katz_z']:+.4f}  p = {m.pvalues['katz_z']:.4f}")
-    log("  saved -> final_headline_test.txt")
+    log("  saved -> exploratory_pooled_cross_section.txt")
     return m
 
 
@@ -211,7 +209,7 @@ def main():
     sweep_raw = pd.read_csv(SWEEP_RAW_CSV)
 
     replicate_homophily_index(mat)
-    headline_test(panel)
+    exploratory_pooled_test(panel)
     _, res_group = heterogeneity_breakdown(sweep_raw)
     structural_diagnostics(mat, res_group)
 

@@ -3,15 +3,17 @@ Load Smirnov & Thurner (2017) replication data (data.mat) and build a
 long-format panel: one row per (group, student, time snapshot) with
 - gpa (time-varying for the 'school' group, static/repeated for university groups)
 - avg_friend_gpa (from that snapshot's directed "like" network)
-- katz-bonacich centrality (from that snapshot's network)
+- outbound Katz-Bonacich centrality (reach through accounts the student liked)
 - in_degree / out_degree
 - level: 'high_school' vs 'university'
 - group: school / freshmen / sophomores / juniors / seniors
 
 Networks are directed ("i gave a like to j" -> A[i,j] = 1), asymmetric.
-Katz-Bonacich centrality is computed on each snapshot's directed network
-using networkx.katz_centrality with alpha set conservatively below
-1/largest-eigenvalue for guaranteed convergence.
+The economic interpretation in this project is access: i can receive information
+or study support through students i liked. NetworkX's directed Katz routine uses
+incoming edges, so we compute it on the reversed graph. That makes the resulting
+score count i's outgoing links in the original data, consistently with
+avg_friend_gpa, which is also based on outgoing links.
 """
 import time
 from pathlib import Path
@@ -42,12 +44,21 @@ LEVEL = {
     "seniors": "university",
 }
 
+# Keep this explicit: changing it changes the economic object being measured.
+KATZ_DIRECTION = "outgoing_original_ties"
+
 
 def katz_centrality_safe(G: nx.DiGraph) -> dict:
-    """Katz-Bonacich centrality with alpha chosen safely below 1/lambda_max."""
+    """Katz reach through outgoing ties, safely below 1/lambda_max.
+
+    ``networkx.katz_centrality`` returns an in-edge score for a DiGraph. Reversing
+    the graph therefore yields the score implied by the project's payoff model,
+    where g_ij = 1 means that i chose/has access to j.
+    """
     if G.number_of_edges() == 0:
         return {n: 0.0 for n in G.nodes()}
-    A = nx.to_scipy_sparse_array(G, format="csr", dtype=float)
+    reach_graph = G.reverse(copy=False)
+    A = nx.to_scipy_sparse_array(reach_graph, format="csr", dtype=float)
     try:
         from scipy.sparse.linalg import eigs
 
@@ -59,9 +70,9 @@ def katz_centrality_safe(G: nx.DiGraph) -> dict:
         lam_max = 1.0
     alpha = 0.85 / lam_max  # conservative safety margin below 1/lambda_max
     try:
-        return nx.katz_centrality(G, alpha=alpha, max_iter=2000, tol=1e-6)
+        return nx.katz_centrality(reach_graph, alpha=alpha, max_iter=2000, tol=1e-6)
     except nx.PowerIterationFailedConvergence:
-        return nx.katz_centrality_numpy(G, alpha=alpha)
+        return nx.katz_centrality_numpy(reach_graph, alpha=alpha)
 
 
 def process_group(mat, group_name):
@@ -97,6 +108,7 @@ def process_group(mat, group_name):
                     "n_timepoints": n_timepoints,
                     "gpa": gpa_t[i],
                     "gpa_time_varying": time_varying_gpa,
+                    "katz_direction": KATZ_DIRECTION,
                     "avg_friend_gpa": avg_friend_gpa[i],
                     "katz_centrality": katz.get(i, np.nan),
                     "in_degree": in_deg.get(i, 0),

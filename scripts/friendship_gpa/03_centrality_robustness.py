@@ -8,8 +8,9 @@ position add anything beyond raw popularity (degree)" question.
 2. Alpha-sensitivity sweep: recompute Katz-Bonacich at several attenuation
    levels (as a fraction of the safe alpha_max = 1/lambda_max) and track,
    at each level:
-     - its raw correlation with in-degree
+     - its raw correlation with out-degree (the direct version of outgoing reach)
      - its own coefficient/significance in a horse race against in/out-degree
+       and average friend GPA
    This tells us whether the "missing" information is simply not present
    at any decay radius (i.e. these networks are locally dominated by
    first-order popularity) or whether it appears at some specific alpha.
@@ -55,10 +56,12 @@ def lambda_max_of(G: nx.DiGraph) -> float:
 
 
 def katz_at_alpha(G, alpha):
+    """Katz reach through outgoing original ties; see script 01 for rationale."""
+    reach_graph = G.reverse(copy=False)
     try:
-        return nx.katz_centrality(G, alpha=alpha, max_iter=3000, tol=1e-6)
+        return nx.katz_centrality(reach_graph, alpha=alpha, max_iter=3000, tol=1e-6)
     except nx.PowerIterationFailedConvergence:
-        return nx.katz_centrality_numpy(G, alpha=alpha)
+        return nx.katz_centrality_numpy(reach_graph, alpha=alpha)
 
 
 # ---------------------------------------------------------------------------
@@ -80,7 +83,8 @@ def build_extended_panel(mat):
 
             katz = katz_at_alpha(G, alpha_safe)
             try:
-                eig = nx.eigenvector_centrality(G, max_iter=2000, tol=1e-06)
+                # Same outgoing-reach interpretation as Katz.
+                eig = nx.eigenvector_centrality(G.reverse(copy=False), max_iter=2000, tol=1e-06)
             except nx.PowerIterationFailedConvergence:
                 eig = {n: np.nan for n in G.nodes()}
             btw = nx.betweenness_centrality(G, normalized=True)
@@ -173,14 +177,19 @@ def alpha_sweep(mat):
             out_deg = dict(G.out_degree())
             gpa_t = gpa_mat[:, t] if time_varying else gpa_mat[:, 0]
 
-            in_deg_arr = np.array([in_deg[i] for i in G.nodes()])
+            out_deg_arr = np.array([out_deg[i] for i in G.nodes()])
+            avg_friend_gpa = {
+                i: float(np.mean(gpa_t[list(G.successors(i))]))
+                if G.out_degree(i) else np.nan
+                for i in G.nodes()
+            }
 
             for frac in ALPHA_FRACTIONS:
                 alpha = frac * (1.0 / lam_max)
                 katz = katz_at_alpha(G, alpha)
                 katz_arr = np.array([katz[i] for i in G.nodes()])
                 corr_with_indeg = (
-                    np.corrcoef(katz_arr, in_deg_arr)[0, 1]
+                    np.corrcoef(katz_arr, out_deg_arr)[0, 1]
                     if np.std(katz_arr) > 0 else np.nan
                 )
                 for i in G.nodes():
@@ -194,7 +203,8 @@ def alpha_sweep(mat):
                             "katz": katz[i],
                             "in_degree": in_deg[i],
                             "out_degree": out_deg[i],
-                            "corr_katz_indeg_snapshot": corr_with_indeg,
+                            "avg_friend_gpa": avg_friend_gpa[i],
+                            "corr_katz_outdeg_snapshot": corr_with_indeg,
                         }
                     )
             log(f"  {group_name} t={t}: alpha sweep done")
@@ -202,16 +212,19 @@ def alpha_sweep(mat):
     df = pd.DataFrame(records)
     df.to_csv(OUT / "robustness_alpha_sweep_raw.csv", index=False)
 
-    # Summary: avg correlation(katz, in_degree) by alpha_frac
-    corr_summary = df.groupby("alpha_frac")["corr_katz_indeg_snapshot"].mean()
-    log("Avg corr(katz, in_degree) across snapshots, by alpha (fraction of alpha_max):")
+    # Summary: avg correlation(katz, out_degree) by alpha_frac
+    corr_summary = df.groupby("alpha_frac")["corr_katz_outdeg_snapshot"].mean()
+    log("Avg corr(katz, out_degree) across snapshots, by alpha (fraction of alpha_max):")
     print(corr_summary)
 
-    # Horse race coefficient on katz at each alpha level (pooled, clustered SE)
-    log("Katz coefficient in horse-race-vs-degree regression, at each alpha level:")
+    # Horse race coefficient on Katz at each alpha level (pooled, clustered SE).
+    # This is exploratory: university GPA is static and repeated across snapshots.
+    log("Katz coefficient net of degree and friend GPA, at each alpha level:")
     coef_rows = []
     for frac in ALPHA_FRACTIONS:
-        sub = df[df["alpha_frac"] == frac].dropna(subset=["gpa", "katz", "in_degree", "out_degree"]).copy()
+        sub = df[df["alpha_frac"] == frac].dropna(
+            subset=["gpa", "katz", "in_degree", "out_degree", "avg_friend_gpa"]
+        ).copy()
         sub["katz_z"] = sub.groupby("group")["katz"].transform(
             lambda s: (s - s.mean()) / s.std() if s.std() > 0 else 0.0
         )
@@ -222,12 +235,12 @@ def alpha_sweep(mat):
             lambda s: (s - s.mean()) / s.std() if s.std() > 0 else 0.0
         )
         m = smf.ols(
-            "gpa ~ katz_z + indeg_z + outdeg_z + C(group)", data=sub
+            "gpa ~ katz_z + indeg_z + outdeg_z + avg_friend_gpa + C(group)", data=sub
         ).fit(cov_type="cluster", cov_kwds={"groups": sub["student_id"]})
         coef_rows.append(
             {
                 "alpha_frac": frac,
-                "avg_corr_katz_indeg": corr_summary.get(frac, np.nan),
+                "avg_corr_katz_outdeg": corr_summary.get(frac, np.nan),
                 "katz_coef": m.params.get("katz_z", np.nan),
                 "katz_se": m.bse.get("katz_z", np.nan),
                 "katz_pval": m.pvalues.get("katz_z", np.nan),

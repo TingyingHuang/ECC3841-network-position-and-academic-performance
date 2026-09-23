@@ -6,9 +6,10 @@ performance,"* PLOS ONE. We add Katz-Bonacich centrality (a tool from class,
 absent from the original paper) and test whether network **position** — not
 just friend-group **composition** — independently predicts GPA.
 
-The full write-up, with the complete chain of reasoning, is in
-**[`research_brief.pdf`](research_brief.pdf)**. This README is a map of how the
-project folder produces that PDF.
+`research_brief.pdf` records the original design and `progress_brief.pdf` records
+the corrected preliminary findings. The longitudinal school analysis is the primary
+empirical test; pooled university regressions are descriptive only because their GPA
+measure is static.
 
 ---
 
@@ -17,7 +18,9 @@ project folder produces that PDF.
 ```
 ECC3841 project/
 ├── README.md                              ← this file
-├── research_brief.pdf                     ← the final write-up (compiled from LaTeX)
+├── research_brief.pdf                     ← original research design
+├── progress_brief.pdf                     ← corrected preliminary findings
+├── requirements.txt                       ← Python dependencies
 ├── Network_Economics_Course_Project_Guide.pdf   ← course-supplied assignment brief
 │
 ├── data/friendship_gpa/                   ← raw input data (untouched, as downloaded)
@@ -28,11 +31,13 @@ ECC3841 project/
 │   ├── plot_homophily.m                   ← original authors' MATLAB code (reference only)
 │   └── simulate.m                         ← original authors' MATLAB code (reference only)
 │
-├── scripts/friendship_gpa/                ← our analysis code, run in order 01 → 04
+├── scripts/friendship_gpa/                ← our analysis code
 │   ├── 01_build_master_dataset.py
 │   ├── 02_analysis.py
 │   ├── 03_centrality_robustness.py
-│   └── 04_final_synthesis.py
+│   ├── 04_final_synthesis.py              ← supplementary pooled diagnostics
+│   ├── 05_school_headline.py              ← primary longitudinal test
+│   └── 06_school_robustness.py            ← direction + reciprocal-tie checks
 │
 ├── output/friendship_gpa/                 ← everything the scripts produce
 │   ├── panel_long.csv                     ← main dataset (from 01)
@@ -41,7 +46,9 @@ ECC3841 project/
 │   ├── layer1_*.txt / .csv                ← replication of the original paper (from 02)
 │   ├── layer2_*.txt / layer3_*.txt        ← first (naive) centrality regressions (from 02)
 │   ├── robustness_*.txt / .csv            ← horse-race + α-sweep robustness checks (from 03)
-│   ├── final_*.txt / .csv                 ← the numbers actually reported in the PDF (from 04)
+│   ├── school_headline_*.txt / .csv       ← primary longitudinal results
+│   ├── school_direction_*.txt / .csv      ← primary robustness checks
+│   ├── final_*.txt / .csv                 ← legacy pooled exploratory outputs; not headline evidence
 │   └── alpha_sweep_chart.html             ← interactive chart of the α decomposition
 │
 └── slides/
@@ -52,6 +59,9 @@ ECC3841 project/
     ├── Presentation2.pptx                 ← Presentation 2 deck (python-pptx)
     ├── build_presentation2_deck.py        ← regenerates Presentation2.pptx from assets_p2/
     ├── build_assets_p2.py                 ← regenerates every figure in assets_p2/
+    ├── presentation2_speaker_script.md    ← editable Presentation 2 speaker script
+    ├── build_presentation2_script.py      ← generates the blue-revision Word script
+    ├── Presentation2_speaker_script_revised.docx ← delivery copy; blue marks revisions
     └── assets_p2/                         ← P2 figures
 ```
 
@@ -76,6 +86,11 @@ student *i* gave student *j* a "like" on a social-networking site at least once
 in that ~3-month window. Only ~25–27% of ties are mutually reciprocated, so
 this is a directed "who I like" graph, not a symmetric friendship graph.
 
+The main analysis treats an outgoing tie as access: if `i → j`, student `i` can
+potentially receive information or support through `j`. Katz centrality and average
+contact GPA therefore both use outgoing ties. Incoming status and reciprocal ties are
+explicit robustness checks.
+
 ---
 
 ## The pipeline: what each script does
@@ -83,10 +98,7 @@ this is a directed "who I like" graph, not a symmetric friendship graph.
 ### `01_build_master_dataset.py`
 Loads `data.mat`, builds a directed graph per network snapshot (`networkx`),
 computes for every student at every snapshot:
-- **Katz-Bonacich centrality**, at a *baseline* attenuation level
-  `α = 0.85 × 1/λ_max` (a conservative fraction of the theoretical convergence
-  bound — chosen here, before any later exploration, which is why this is the
-  specification treated as pre-specified/confirmatory in step 04).
+- **Outgoing-reach Katz-Bonacich centrality**, at `α = 0.85 × 1/λ_max`.
 - in-degree, out-degree, average friend GPA (Smirnov & Thurner's own variable).
 
 Output: `panel_long.csv` — one row per (student, snapshot).
@@ -102,27 +114,46 @@ The stress-testing stage:
 - Adds betweenness and eigenvector centrality.
 - Runs the **horse race**: Katz vs. raw in/out-degree, to check whether Katz
   is just a repackaging of popularity (it mostly is, at the baseline α).
-- Sweeps the attenuation parameter α (6 levels, 5% to 95% of its theoretical
-  max) and re-runs the horse race at each level — this is what reveals that
-  Katz only carries independent information at *high* α.
+- Sweeps α from 5% to 95% of its theoretical maximum while retaining degree,
+  average contact GPA, and cohort controls.
 - Breaks the sweep down per cohort.
 
 Output includes `robustness_alpha_sweep_raw.csv`, the largest file in the
 project (~21MB): every student, every snapshot, every α level.
 
 ### `04_final_synthesis.py`
-Consolidates everything that ended up in the report's conclusion into one
-reproducible script:
+Produces supplementary cross-sectional diagnostics and the original-paper homophily
+replication. It is not the headline test because university GPA cannot support a
+`t → t+1` outcome model.
+
+### `05_school_headline.py`
+Runs the primary longitudinal test in the only cohort with genuinely time-varying GPA.
+It predicts GPA at `t+1` from network position at `t`, past GPA, contact GPA, direct
+degrees, and snapshot fixed effects.
+
+### `06_school_robustness.py`
+Re-runs the school model using incoming-status centrality and reciprocal ties.
+
+`04_final_synthesis.py` retains these supplementary diagnostics:
 - **A.** Re-derives Smirnov & Thurner's own headline statistic (the Homophily
   Index) directly from their published formula, on the same data — used in
   the PDF to benchmark our effect size honestly against theirs.
-- **B.** The **one pre-specified headline regression** (see "The model" below)
-  — this is the confirmatory result, run once, at the baseline α fixed in
-  script 01, not selected after seeing the sweep.
+- **B.** Cross-sectional pooled regressions, retained as descriptive diagnostics
+  rather than as the headline evidence.
 - **C/D.** The α-sweep broken down by level (high-school vs. university) and
   by the 5 individual cohorts — reported as exploratory evidence.
 - **E.** Network density/reciprocity/clustering per cohort, checked against
   the cohort-level heterogeneity from C/D.
+
+## Presentation 2 materials
+
+`slides/Presentation2.pptx` presents the initial pooled association, the
+identification audit, and the corrected longitudinal school result. The matching
+speaker script is `slides/presentation2_speaker_script.md`. Run
+`python3 slides/build_presentation2_script.py` to regenerate the Word copy;
+blue text in that copy marks statements added or substantially revised after the
+model audit. Presentation 3 will address the network-economics mechanism,
+link-formation incentives, and the final manager-facing recommendation.
 
 **To reproduce everything from scratch:**
 ```bash
@@ -130,10 +161,12 @@ cd scripts/friendship_gpa
 python3 01_build_master_dataset.py
 python3 02_analysis.py
 python3 03_centrality_robustness.py
+python3 05_school_headline.py
+python3 06_school_robustness.py
+# Optional descriptive diagnostics only:
 python3 04_final_synthesis.py
 ```
-Runs in under 2 minutes total (uses `igraph` for the expensive centrality
-steps in script 03; `networkx` elsewhere).
+Install dependencies with `python3 -m pip install -r requirements.txt` before running.
 
 ---
 
@@ -143,39 +176,32 @@ steps in script 03; `networkx` elsewhere).
 node *i* in a directed adjacency matrix $A$:
 
 $$
-c(\alpha) = (I - \alpha A)^{-1} A \mathbf{1}, \qquad
+b(\alpha) = (I - \alpha A)^{-1}\mathbf{1}, \qquad
 0 < \alpha < \frac{1}{\lambda_{max}(A)}
 $$
 
 $\alpha$ controls how much weight is given to *indirect* (multi-step)
-connections relative to direct ones. As $\alpha \to 0$, $c(\alpha)$ converges
-to raw degree (only direct ties count). As $\alpha \to 1/\lambda_{max}$, it
-increasingly reflects long, indirect reach through the whole network. This is
-the parameter script 03 sweeps.
+connections relative to direct ones. In the main interpretation, row `i` of `A`
+lists students that `i` liked, so the score measures outgoing reach. As $\alpha \to
+0$, it approaches direct out-degree; as $\alpha \to 1/\lambda_{max}$, it increasingly
+reflects long, indirect reach.
 
-**The headline regression** (script 04, part B — the one confirmatory test):
+**The headline regression** (`05_school_headline.py`, school cohort only):
 
 $$
-GPA_{it} = \beta_0 + \beta_1\,\text{Katz}^z_{it} + \beta_2\,\text{InDegree}^z_{it}
-+ \beta_3\,\text{OutDegree}^z_{it} + \beta_4\,\overline{GPA}^{friends}_{it}
-+ \gamma_{\text{cohort}} + \varepsilon_{it}
+GPA_{i,t+1} = \beta_0 + \beta_1\,\text{Katz}^z_{it} + \beta_2\,GPA^z_{it}
++ \beta_3\,\text{InDegree}^z_{it} + \beta_4\,\text{OutDegree}^z_{it}
++ \beta_5\,\overline{GPA}^{contacts}_{it} + \gamma_t + \varepsilon_{it}
 $$
 
-- Superscript $z$ = standardized (mean 0, SD 1) within each cohort, so
-  coefficients are comparable across cohorts of very different network size.
-- $\overline{GPA}^{friends}_{it}$ = Smirnov & Thurner's own selection-channel
-  variable (average GPA of student *i*'s direct out-links) — included so that
-  any remaining Katz effect is provably *not* just their finding relabelled.
-- $\gamma_{\text{cohort}}$ = fixed effects for the 5 cohorts.
-- Standard errors clustered by student (each student appears once per network
-  snapshot, so observations are not independent).
-- Result: $\hat\beta_1 = -0.0415$ (SE $=0.019$, $p=0.033$, $n=36{,}696$).
+- The sample has 535 students and up to five transitions each.
+- Contact GPA uses outgoing ties, consistently with Katz; $\gamma_t$ is a snapshot
+  fixed effect; standard errors are clustered by student.
+- Treat the result as evidence about prediction, not proof of a causal effect.
 
-**Why the horse race matters:** Katz-Bonacich correlates 0.85–0.89 with raw
-in-degree in these networks. Any claim that "centrality predicts GPA" is not
-credible unless it survives having raw degree in the same regression — see
-`robustness_full_horse_race.txt` and `robustness_alpha_sweep_summary.csv` for
-the full check.
+**Why the horse race matters:** Katz-Bonacich can closely track raw degree. A claim
+about indirect reach must survive direct-degree controls and the direction/reciprocity
+checks in `06_school_robustness.py`.
 
 ---
 
@@ -186,11 +212,10 @@ the full check.
 | `layer1_check1_lagged_regression.txt` | Replication: friend's past GPA does **not** predict your future GPA |
 | `layer1_check2_new_vs_dropped.csv` | Replication: new friends are more GPA-similar than dropped friends (selection effect) |
 | `robustness_full_horse_race.txt` | Naive Katz/eigenvector effects **disappear** once raw degree is controlled for |
-| `robustness_alpha_sweep_summary.csv` | The α sweep: where Katz stops being "popularity in disguise" |
-| `final_headline_test.txt` | **The one confirmatory result** reported in the PDF conclusion |
-| `final_heterogeneity_by_level.csv` / `_by_group.csv` | Where the effect does/doesn't replicate across cohorts |
-| `final_homophily_index_replication.csv` | Original paper's effect size, recomputed, for honest comparison |
-| `final_structural_diagnostics.csv` | Network density explanation for cohort heterogeneity |
+| `robustness_alpha_sweep_summary.csv` | Exploratory pooled α sweep, with degree and contact-GPA controls |
+| `school_headline_test.txt` | Primary longitudinal school result |
+| `school_direction_and_reciprocity_robustness.csv` | Outgoing, incoming, and reciprocal-tie checks |
+| `final_*.csv` / `final_*.txt` | Legacy pooled exploratory outputs; not final evidence |
 | `alpha_sweep_chart.html` | Visual version of the α-decomposition finding |
 
 ---

@@ -64,7 +64,11 @@ def add_z(lag):
     return lag
 
 
-FORMULA = "gpa_t1 ~ katz_t_z + gpa_t_z + avg_friend_gpa_t + indeg_t_z + outdeg_t_z"
+# Snapshot fixed effects absorb term-wide changes in marking or other common shocks.
+FORMULA = (
+    "gpa_t1 ~ katz_t_z + gpa_t_z + avg_friend_gpa_t + indeg_t_z + outdeg_t_z "
+    "+ C(time_index)"
+)
 
 
 def main():
@@ -106,8 +110,8 @@ def main():
         cov_type="cluster", cov_kwds={"groups": lagged["student_id"]})
     with open(OUT / "school_headline_test.txt", "w") as f:
         f.write("SCHOOL-ONLY HEADLINE TEST\n")
-        f.write("gpa_(t+1) ~ Katz_z(alpha=0.85) + GPA_t_z (own past GPA) "
-                "+ avg_friend_gpa_t + indeg_z + outdeg_z\n")
+        f.write("gpa_(t+1) ~ Katz_z(alpha=0.85, outgoing reach) + GPA_t_z "
+                "+ avg_friend_gpa_t + indeg_z + outdeg_z + time fixed effects\n")
         f.write(f"n = {len(lagged)}, students = {lagged.student_id.nunique()}\n")
         f.write("SEs clustered by student.\n\n")
         f.write(m.summary().as_text())
@@ -121,8 +125,10 @@ def main():
     # ------------------------------------------------ phi sweep, school only
     sweep = pd.read_csv(OUT / "robustness_alpha_sweep_raw.csv")
     sweep = sweep[sweep.group == "school"].copy()
-    afg = school[["student_id", "time_index", "avg_friend_gpa"]]
-    sweep = sweep.merge(afg, on=["student_id", "time_index"], how="left")
+    # New sweep outputs include friend GPA. Keep compatibility with older outputs.
+    if "avg_friend_gpa" not in sweep.columns:
+        afg = school[["student_id", "time_index", "avg_friend_gpa"]]
+        sweep = sweep.merge(afg, on=["student_id", "time_index"], how="left")
 
     rows = []
     for frac in PHI_FRACTIONS:

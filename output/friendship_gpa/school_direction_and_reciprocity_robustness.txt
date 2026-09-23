@@ -1,0 +1,116 @@
+
+========================================================================
+OUTGOING
+gpa_t1 ~ katz_t_z + gpa_t_z + avg_contact_gpa_t + indeg_t_z + outdeg_t_z + C(time_index)
+n=2088, students=535
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                 gpa_t1   R-squared:                       0.910
+Model:                            OLS   Adj. R-squared:                  0.910
+Method:                 Least Squares   F-statistic:                     3961.
+Date:                Wed, 23 Sep 2026   Prob (F-statistic):               0.00
+Time:                        14:15:50   Log-Likelihood:                 781.75
+No. Observations:                2088   AIC:                            -1544.
+Df Residuals:                    2078   BIC:                            -1487.
+Df Model:                           9                                         
+Covariance Type:              cluster                                         
+======================================================================================
+                         coef    std err          z      P>|z|      [0.025      0.975]
+--------------------------------------------------------------------------------------
+Intercept              3.8327      0.038    101.261      0.000       3.758       3.907
+C(time_index)[T.1]     0.0293      0.017      1.730      0.084      -0.004       0.063
+C(time_index)[T.2]     0.0365      0.010      3.817      0.000       0.018       0.055
+C(time_index)[T.3]     0.0688      0.016      4.381      0.000       0.038       0.100
+C(time_index)[T.4]     0.0399      0.010      3.833      0.000       0.020       0.060
+katz_t_z               0.0093      0.006      1.480      0.139      -0.003       0.022
+gpa_t_z                0.5247      0.004    131.145      0.000       0.517       0.533
+avg_contact_gpa_t     -0.0059      0.010     -0.622      0.534      -0.025       0.013
+indeg_t_z              0.0019      0.004      0.548      0.584      -0.005       0.009
+outdeg_t_z            -0.0020      0.006     -0.364      0.716      -0.013       0.009
+==============================================================================
+Omnibus:                      494.169   Durbin-Watson:                   2.018
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):            25332.362
+Skew:                           0.106   Prob(JB):                         0.00
+Kurtosis:                      20.063   Cond. No.                         47.3
+==============================================================================
+
+Notes:
+[1] Standard Errors are robust to cluster correlation (CRV1)
+
+========================================================================
+INCOMING
+gpa_t1 ~ katz_t_z + gpa_t_z + avg_contact_gpa_t + indeg_t_z + outdeg_t_z + C(time_index)
+n=1444, students=443
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                 gpa_t1   R-squared:                       0.918
+Model:                            OLS   Adj. R-squared:                  0.918
+Method:                 Least Squares   F-statistic:                     2994.
+Date:                Wed, 23 Sep 2026   Prob (F-statistic):               0.00
+Time:                        14:15:50   Log-Likelihood:                 591.80
+No. Observations:                1444   AIC:                            -1164.
+Df Residuals:                    1434   BIC:                            -1111.
+Df Model:                           9                                         
+Covariance Type:              cluster                                         
+======================================================================================
+                         coef    std err          z      P>|z|      [0.025      0.975]
+--------------------------------------------------------------------------------------
+Intercept              3.8432      0.049     78.525      0.000       3.747       3.939
+C(time_index)[T.1]     0.0312      0.020      1.551      0.121      -0.008       0.071
+C(time_index)[T.2]     0.0252      0.011      2.284      0.022       0.004       0.047
+C(time_index)[T.3]     0.0552      0.018      2.999      0.003       0.019       0.091
+C(time_index)[T.4]     0.0249      0.011      2.229      0.026       0.003       0.047
+katz_t_z               0.0100      0.006      1.587      0.112      -0.002       0.022
+gpa_t_z                0.5304      0.004    121.820      0.000       0.522       0.539
+avg_contact_gpa_t     -0.0051      0.012     -0.414      0.679      -0.029       0.019
+indeg_t_z             -0.0107      0.007     -1.456      0.145      -0.025       0.004
+outdeg_t_z             0.0095      0.003      3.216      0.001       0.004       0.015
+==============================================================================
+Omnibus:                      443.477   Durbin-Watson:                   2.026
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):            28510.528
+Skew:                           0.539   Prob(JB):                         0.00
+Kurtosis:                      24.742   Cond. No.                         54.5
+==============================================================================
+
+Notes:
+[1] Standard Errors are robust to cluster correlation (CRV1)
+
+========================================================================
+RECIPROCAL
+gpa_t1 ~ katz_t_z + gpa_t_z + avg_contact_gpa_t + indeg_t_z + C(time_index)
+n=908, students=330
+
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                 gpa_t1   R-squared:                       0.926
+Model:                            OLS   Adj. R-squared:                  0.925
+Method:                 Least Squares   F-statistic:                     2347.
+Date:                Wed, 23 Sep 2026   Prob (F-statistic):          5.07e-285
+Time:                        14:15:50   Log-Likelihood:                 407.29
+No. Observations:                 908   AIC:                            -796.6
+Df Residuals:                     899   BIC:                            -753.3
+Df Model:                           8                                         
+Covariance Type:              cluster                                         
+======================================================================================
+                         coef    std err          z      P>|z|      [0.025      0.975]
+--------------------------------------------------------------------------------------
+Intercept              3.8665      0.047     81.869      0.000       3.774       3.959
+C(time_index)[T.1]     0.0289      0.025      1.169      0.243      -0.020       0.077
+C(time_index)[T.2]     0.0180      0.013      1.371      0.170      -0.008       0.044
+C(time_index)[T.3]     0.0537      0.022      2.423      0.015       0.010       0.097
+C(time_index)[T.4]     0.0209      0.015      1.384      0.166      -0.009       0.050
+katz_t_z               0.0077      0.008      0.975      0.330      -0.008       0.023
+gpa_t_z                0.5362      0.005    110.423      0.000       0.527       0.546
+avg_contact_gpa_t     -0.0105      0.012     -0.899      0.369      -0.033       0.012
+indeg_t_z           3.591e-05      0.007      0.005      0.996      -0.014       0.014
+==============================================================================
+Omnibus:                      299.474   Durbin-Watson:                   2.092
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):            17683.293
+Skew:                          -0.641   Prob(JB):                         0.00
+Kurtosis:                      24.581   Cond. No.                         45.3
+==============================================================================
+
+Notes:
+[1] Standard Errors are robust to cluster correlation (CRV1)

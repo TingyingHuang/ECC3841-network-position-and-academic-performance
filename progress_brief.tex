@@ -52,28 +52,27 @@ the foundation the rest of the brief builds on.
 
 \section*{Result 2: the naive centrality effect is popularity, relabelled}
 
-Katz--Bonacich on its own, net of friend GPA, pooled across all five groups
-($n=36{,}696$): coefficient $+0.093$ (standardized), $p<0.001$. Looks like position
-matters. Add raw in-degree and out-degree to the same regression: the coefficient
-drops to $-0.028$, $p=0.446$, no longer significant, while in-degree itself is
-$+0.153$, $p<0.001$. The naive effect was popularity wearing a different name.
+Katz--Bonacich on its own, net of contact GPA, pooled across all five groups
+($n=36{,}696$): coefficient $+0.089$ (standardized), $p<0.001$. Looks like position
+matters. Add raw in-degree and out-degree to the same regression: the Katz coefficient
+is $+0.012$, $p=0.760$, while direct degrees remain significant. The naive association
+does not survive the degree controls.
 
-\section*{Result 3: the planned headline test, and a gap in it}
+\section*{Result 3: pooled exploration, and a gap in it}
 
-Sweeping $\phi$, net of friend GPA and popularity, pooled across all five groups:
+Sweeping $\phi$, net of contact GPA and popularity, pooled across all five groups:
 
 \begin{center}
 \begin{tabular}{lrrrrrr}
 $\phi$ (frac.\ of ceiling) & 0.05 & 0.20 & 0.40 & 0.60 & 0.80 & 0.95 \\
 \hline
-Katz coefficient & $+0.082$ & $+0.022$ & $-0.034$ & $-0.051$ & $-0.048$ & $-0.036$ \\
-$p$-value & $0.012$ & $0.598$ & $0.407$ & $0.115$ & $0.031$ & $0.011$ \\
+Katz coefficient & $+0.103$ & $+0.092$ & $+0.054$ & $+0.024$ & $+0.007$ & $+0.001$ \\
+$p$-value & $<0.001$ & $0.022$ & $0.214$ & $0.485$ & $0.767$ & $0.946$ \\
 \end{tabular}
 \end{center}
 
-At $\phi=0.85$ (fixed in advance as the headline): coefficient $-0.0415$,
-$\mathrm{SE}=0.019$, $p=0.033$, $n=36{,}696$. Read at face value: net of popularity and
-friend GPA, position has a small, negative, independent effect.
+At $\phi=0.85$: coefficient $+0.004$, $p=0.835$, $n=36{,}696$. This pooled
+cross-sectional association is descriptive only, not the headline estimate.
 
 But this regression never controlled for a student's own past GPA, and it should
 have. GPA is time-varying only for the 655 high-school students (6 measurements over
@@ -99,40 +98,39 @@ exactly what sweeping $\phi$ is for.)
 \begin{tabular}{lrrrrrr}
 $\phi$ (frac.\ of ceiling) & 0.05 & 0.20 & 0.40 & 0.60 & 0.80 & 0.95 \\
 \hline
-Katz coefficient & $-0.004$ & $-0.002$ & $+0.001$ & $+0.003$ & $+0.004$ & $+0.005$ \\
-$p$-value & $0.62$ & $0.84$ & $0.93$ & $0.74$ & $0.51$ & $0.36$ \\
+Katz coefficient & $+0.006$ & $+0.015$ & $+0.018$ & $+0.015$ & $+0.010$ & $+0.007$ \\
+$p$-value & $0.58$ & $0.17$ & $0.09$ & $0.10$ & $0.13$ & $0.18$ \\
 \end{tabular}
 \end{center}
 
-At every $\phi$, not significant, and the sign is not even consistent. Once a
-student's own trajectory is properly controlled, in the one sample where that is
-possible, Katz--Bonacich centrality does not predict GPA.
+At the primary $\phi=0.85$ setting, the school estimate is $+0.009$ ($p=0.139$).
+Its 95\% confidence interval is $[-0.003, 0.022]$, and no point in the $\phi$ sweep
+is statistically significant.
+Once a student's own trajectory is controlled, we do not find evidence that
+Katz--Bonacich centrality predicts next-period GPA.
 
 \begin{center}
 \fbox{\parbox{0.9\linewidth}{\centering
-Net of popularity, friend GPA, and a student's own past performance, we find no
-evidence that network position independently predicts grades. The effects that
-appeared in Results 2 and 3 do not survive a correctly specified test.}}
+Net of popularity, contact GPA, a student's own past performance, and common
+snapshot shocks, we do not find evidence that outgoing network reach independently
+predicts grades.}}
 \end{center}
 
 \section*{Why this is still worth reporting}
 
 Three specifications, three different pictures: naive centrality looked positive,
-the pooled sweep looked negative, the corrected test looks like nothing. The first two
-looked like findings and neither survived scrutiny. That progression is itself the
-result:
+the pooled sweep changed with $\phi$, and the corrected test finds no statistically
+significant association. The first two looked like findings and neither survived
+scrutiny. That progression is itself the result:
 \begin{itemize}
-  \item It is the first time this claim --- that Katz--Bonacich centrality
-        (Calv\'o-Armengol, Patacchini \& Zenou, 2009) independently predicts
-        achievement --- has been tested with a real time lag and an own-performance
-        control, which their cross-sectional data could not support.
+  \item The high-school panel permits a real time lag and an own-performance control,
+        which cross-sectional comparisons cannot provide.
   \item It shows a general risk: pooling groups with different data structures (GPA
         that varies over time in one, static in four) can manufacture a significant
         coefficient that the one correctly specified subsample does not support.
   \item It is a decision-relevant answer: interventions built around widening
-        students' network reach are not supported by this data once the obvious
-        confounds --- popularity, friend quality, the student's own trajectory --- are
-        properly controlled.
+        students' network reach are not supported by this data once direct ties,
+        contact GPA, past performance, and common time shocks are controlled.
 \end{itemize}
 
 \section*{Limitations and what's next}
@@ -147,9 +145,9 @@ result:
         found under the pooled specification, without an own-GPA control. It has not
         been re-checked under the corrected specification and should be treated as
         unconfirmed.
-  \item Betweenness and eigenvector centrality were checked in the naive horse race
-        only (both similarly explained by degree); neither has been run through the
-        corrected, school-only design yet.
+  \item The main result is robust to interpreting centrality as incoming status and
+        to retaining only reciprocal ties; these checks are less precise because they
+        use fewer valid observations.
 \end{itemize}
 
 \vspace{1em}

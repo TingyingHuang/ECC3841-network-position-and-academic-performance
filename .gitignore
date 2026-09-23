@@ -2,6 +2,9 @@
 __pycache__/
 *.pyc
 .DS_Store
+*.aux
+*.log
+*.out
 
 # third-party papers kept for our own reading; not ours to publish
 references/
