@@ -1,7 +1,8 @@
 """
 05_school_headline.py
 
-Restrict the confirmatory ("headline") test to the high-school group --
+Restrict the narrower test (does Katz add anything beyond direct degree?) to the
+high-school group --
 the only group where GPA is genuinely time-varying -- so that we can:
 
   1. measure position at t and GPA at t+1 (a real lag), and

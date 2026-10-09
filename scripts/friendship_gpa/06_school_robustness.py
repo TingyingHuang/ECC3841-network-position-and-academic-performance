@@ -1,4 +1,4 @@
-"""School-only robustness checks for the project's longitudinal headline test.
+"""School-only robustness checks for the narrower beyond-degree test (script 05).
 
 All specifications predict GPA at t+1 and control for GPA at t, direct degree,
 average contact GPA, and snapshot fixed effects. They differ only in the network
