@@ -7,7 +7,7 @@ from pptx import Presentation
 from pptx.util import Inches as _Inches, Pt as _Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.dml import MSO_LINE_DASH_STYLE
-from pptx.enum.shapes import MSO_SHAPE, MSO_CONNECTOR
+from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -66,11 +66,38 @@ def text(s, x, y, w, h, value, size=14, color=DARK, bold=False, font=BODY, align
     return tb
 
 
+def polyline(s, pts, color=NODE, w=1.25, dash=False):
+    """Path through pts (inches), drawn as a closed freeform that retraces itself.
+    Connectors and rotated lines lose their direction when the deck is imported into Canva,
+    and some renderers (macOS Quick Look) misdraw open freeform paths; a closed path that
+    goes out and back along the same points looks like a plain line everywhere.
+    Dashed lines are built from short solid pieces for the same reason."""
+    if dash:
+        (x1, y1), (x2, y2) = pts[0], pts[-1]
+        length = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
+        n = max(1, int(length / 0.14))
+        for k in range(n):
+            a, b = k / n, min(1.0, k / n + 0.08 / length)
+            polyline(s, [(x1 + a * (x2 - x1), y1 + a * (y2 - y1)), (x1 + b * (x2 - x1), y1 + b * (y2 - y1))], color, w)
+        return None
+    route = list(pts) + list(pts[-2::-1])
+    emu = [(int(Inches(x)), int(Inches(y))) for x, y in route]
+    xs, ys = [p[0] for p in emu], [p[1] for p in emu]
+    if max(xs) == min(xs):  # keep a non-zero box so every app accepts the path
+        emu[1] = (emu[1][0] + 1, emu[1][1])
+    if max(ys) == min(ys):
+        emu[1] = (emu[1][0], emu[1][1] + 1)
+    fb = s.shapes.build_freeform(emu[0][0], emu[0][1], scale=1.0)
+    fb.add_line_segments(emu[1:], close=True)
+    sh = fb.convert_to_shape()
+    sh.fill.background()
+    sh.line.color.rgb = rgb(color); sh.line.width = Pt(w)
+    sh.shadow.inherit = False
+    return sh
+
+
 def line(s, x1, y1, x2, y2, color=NODE, w=1.25, dash=False):
-    c = s.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(x1), Inches(y1), Inches(x2), Inches(y2))
-    c.line.color.rgb = rgb(color); c.line.width = Pt(w)
-    if dash: c.line.dash_style = MSO_LINE_DASH_STYLE.DASH
-    return c
+    return polyline(s, [(x1, y1), (x2, y2)], color, w, dash)
 
 
 def node(s, x, y, label="", fill=GREY, r=0.2, size=10, color=WHITE):
@@ -184,8 +211,7 @@ def line_chart(s, x, y, w, h, series, xvals, ylab="", title="", xlab=""):
         text(s, sx(i) - 0.3, py0 + 0.03, 0.6, 0.2, str(xv), 8.5, GREY, align=PP_ALIGN.CENTER)
     for name, vals, col in series:
         pts = [(sx(i), sy(v)) for i, v in enumerate(vals)]
-        for (x1, y1), (x2, y2) in zip(pts, pts[1:]):
-            line(s, x1, y1, x2, y2, col, 2.25)
+        polyline(s, pts, col, 2.25)
         for px_, py_ in pts:
             box(s, px_ - 0.045, py_ - 0.045, 0.09, 0.09, col, WHITE, MSO_SHAPE.OVAL)
     if xlab: text(s, x, py0 + 0.22, w, 0.2, xlab, 8.5, GREY, italic=True, align=PP_ALIGN.CENTER)

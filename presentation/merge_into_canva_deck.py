@@ -5,7 +5,8 @@ Her slides that carry over (title, recap, models, Model 2 takeaway, result chart
 question, thank-you) are edited in place: same boxes, fonts and positions, new text.
 Content she does not have (Model 1, the Model 2 and Model 3 games, Model 2 on our data,
 use 3 and the manager decision) is copied in from build_deck.py built at her slide size
-(P3_SCALE=1.5). Her other slides (old Model 1/2 setup and evidence, literature,
+(P3_SCALE=1.5). Her result chart and title-page network are also replaced: Canva exports
+their lines as rotated or flipped shapes, which lose their direction when re-imported. Her other slides (old Model 1/2 setup and evidence, literature,
 limitations, conclusion, references) are dropped: they repeat other slides or are not
 required for Presentation 3.
 
@@ -92,6 +93,19 @@ def main(canva, generated, out):
     a = list(A.slides)
     g = list(G.slides)
 
+    # ---- title: keep her text, replace the network drawing (right of 12.5 in) ----
+    s = a[0]
+    for sh in list(s.shapes):
+        if Emu(sh.left).inches >= 12.5:
+            sh._element.getparent().remove(sh._element)
+    used = max(int(x) for x in s.shapes._spTree.xpath(".//p:cNvPr/@id"))
+    for sh in g[0].shapes:
+        if Emu(sh.left).inches >= 12.5:
+            el = copy.deepcopy(sh._element)
+            for c in el.xpath(".//p:cNvPr"):
+                used += 1; c.set("id", str(used))
+            s.shapes._spTree.append(el)
+
     # ---- recap: the numbers Presentation 2 actually showed ----------------------
     s = a[1]
     for lab, val, sub, (nl, nv, ns) in [
@@ -153,13 +167,6 @@ def main(canva, generated, out):
     set_text(s, "TextBox 16", "Use 2: design study groups, early")
     set_text(s, "TextBox 17", "Mixing won't happen by itself. Form mixed-ability groups in first year. Lecture 7 (Bangladesh RCT): friendship groups with a cap on the group's average score raised scores.")
 
-    # ---- Model 3 result chart ---------------------------------------------------
-    s = a[7]
-    set_text(s, "TextBox 2", "MODEL 3 · RESULT")
-    set_text(s, "TextBox 8", "Highest Katz")
-    set_text(s, "TextBox 11", "Most active")
-    set_text(s, "TextBox 143", "Share of students who end up adopting (%), starting with 3% of students, 300 simulations per point. Easy habit (r = 1): spreads anyway. Hard habit (r ≥ 4): barely spreads. Critical mass (Lecture 1).")
-
     # ---- answering the core question --------------------------------------------
     s = a[9]
     set_text(s, "TextBox 8", "What structure explains")
@@ -176,9 +183,9 @@ def main(canva, generated, out):
     set_text(s, "TextBox 4", "Amy Bing: [contribution]\nTingying Huang: [contribution]")
 
     # ---- insert generated slides, drop the replaced ones, set the order ------------
-    new = {k: copy_in(A, g[k - 1]) for k in (4, 5, 6, 7, 8, 10, 12, 13)}
+    new = {k: copy_in(A, g[k - 1]) for k in (4, 5, 6, 7, 8, 10, 11, 12, 13)}
     order = [a[0], a[1], a[2], new[4], new[5], new[6], new[7], new[8], a[5], new[10],
-             a[7], new[12], new[13], a[9], a[15]]
+             new[11], new[12], new[13], a[9], a[15]]
     lst = A.slides._sldIdLst
     ids = {sl.slide_id: el for sl, el in zip(A.slides, list(lst))}
     order_ids = [sl.slide_id for sl in order]
