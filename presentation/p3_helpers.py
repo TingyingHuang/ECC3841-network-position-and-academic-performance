@@ -1,9 +1,10 @@
 """Drawing primitives shared by the P3 deck. Same visual language as the P2 deck:
 cream background, orange/green accents, Georgia headings, native shapes and charts only.
 Generated files go to P3/ at the repository root, which Git ignores."""
+import os
 from pathlib import Path
 from pptx import Presentation
-from pptx.util import Inches, Pt
+from pptx.util import Inches as _Inches, Pt as _Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.dml import MSO_LINE_DASH_STYLE
 from pptx.enum.shapes import MSO_SHAPE, MSO_CONNECTOR
@@ -13,7 +14,18 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "output" / "friendship_gpa"
 P3 = ROOT / "P3"
 P3.mkdir(exist_ok=True)
+# P3_SCALE=1.5 builds the same deck at 20 x 11.25 in, the size of the Canva export it is merged into
+SCALE = float(os.environ.get("P3_SCALE", "1"))
 W, H = 13.333, 7.5
+
+
+def Inches(v):
+    return _Inches(v * SCALE)
+
+
+def Pt(v):
+    return _Pt(v * SCALE)
+
 BG, WHITE, ORANGE, DARK, GREEN, GREY, LINE, SAND, NODE = (
     "FAF8F5", "FFFFFF", "C4602F", "262522", "4F7A5F", "6F6C67", "E3DDD3", "F5F1EA", "BDB8B0")
 HEAD, BODY = "Georgia", "Arial"

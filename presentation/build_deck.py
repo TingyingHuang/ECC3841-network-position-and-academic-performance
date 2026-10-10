@@ -13,6 +13,7 @@ Every number on the slides is read from output/friendship_gpa/ (scripts 01-09), 
 the Lecture 7 benchmarks, which are quoted from the lecture slides.
 Run from anywhere: python3 presentation/build_deck.py
 """
+import os
 import sys
 from pathlib import Path
 
@@ -343,6 +344,6 @@ cards3(s, 2.25, 4.2, [
     ("Contagion", "Granovetter, M. (1978). Threshold models of collective behavior. American Journal of Sociology, 83(6), 1420–1443.\n\nWatts, D. J. (2002). A simple model of global cascades on random networks. PNAS, 99(9), 5766–5771.", DARK)],
     title_h=0.5, size=10.5)
 
-out = P3 / "ECC3841 Presentation 3.pptx"
+out = Path(os.environ.get("P3_DECK_OUT", P3 / "ECC3841 Presentation 3.pptx"))
 prs.save(out)
 print(out)

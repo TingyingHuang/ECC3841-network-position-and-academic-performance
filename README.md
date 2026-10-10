@@ -93,7 +93,14 @@ python3 presentation/build_deck.py      # P3/ECC3841 Presentation 3.pptx
 python3 presentation/build_script.py    # P3/scripts.pdf
 ```
 
-`presentation/render_preview.py` renders slide previews with macOS Quick Look. `P3/` is ignored by Git.
+The final deck uses the page design of Amy's Canva export (not in Git). `merge_into_canva_deck.py` edits her slides in place and inserts the generated slides, built at her 20 x 11.25 in size:
+
+```bash
+P3_SCALE=1.5 P3_DECK_OUT=/tmp/deck_x15.pptx python3 presentation/build_deck.py
+python3 presentation/merge_into_canva_deck.py "<Canva export>.pptx" /tmp/deck_x15.pptx "P3/ECC3841 Presentation 3 (Amy layout).pptx"
+```
+
+`presentation/render_preview.py` renders slide previews with macOS Quick Look (it does not draw Canva's grouped shapes). `P3/` is ignored by Git.
 
 ## Expected outputs
 
