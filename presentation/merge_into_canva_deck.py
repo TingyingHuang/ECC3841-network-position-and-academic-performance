@@ -88,6 +88,93 @@ def clone(slide, name):
     return slide.shapes[-1]
 
 
+A_NS = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
+
+
+def unscale_groups(slide):
+    """Canva stores frames, underlines and callouts as groups drawn at 0.75 scale
+    (ext != chExt). Some viewers (Quick Look, Keynote) then drop the shapes. Apply each
+    group's scale to its children so every group draws at 1:1; the look is unchanged."""
+    def fix(grp):
+        x = grp.find(f"{A_NS}xfrm") if grp.tag.endswith("grpSpPr") else None
+        if x is None:
+            return
+        off, ext, choff, chext = (x.find(f"{A_NS}{t}") for t in ("off", "ext", "chOff", "chExt"))
+        if None in (off, ext, choff, chext):
+            return
+        sx = int(ext.get("cx")) / max(1, int(chext.get("cx")))
+        sy = int(ext.get("cy")) / max(1, int(chext.get("cy")))
+        ox, oy, cx0, cy0 = int(off.get("x")), int(off.get("y")), int(choff.get("x")), int(choff.get("y"))
+        for child in grp.getparent():
+            pr = child.find(f"{{http://schemas.openxmlformats.org/presentationml/2006/main}}spPr")
+            if pr is None:
+                pr = child.find(f"{{http://schemas.openxmlformats.org/presentationml/2006/main}}grpSpPr")
+            cx = pr.find(f"{A_NS}xfrm") if pr is not None else None
+            if cx is None or cx.find(f"{A_NS}off") is None:
+                continue
+            co, ce = cx.find(f"{A_NS}off"), cx.find(f"{A_NS}ext")
+            co.set("x", str(round(ox + (int(co.get("x")) - cx0) * sx)))
+            co.set("y", str(round(oy + (int(co.get("y")) - cy0) * sy)))
+            ce.set("cx", str(round(int(ce.get("cx")) * sx)))
+            ce.set("cy", str(round(int(ce.get("cy")) * sy)))
+        choff.set("x", off.get("x")); choff.set("y", off.get("y"))
+        chext.set("cx", ext.get("cx")); chext.set("cy", ext.get("cy"))
+    # outermost groups first, so nested groups see their final position before being fixed
+    groups = [g for g in slide.shapes._spTree.iter(f"{{http://schemas.openxmlformats.org/presentationml/2006/main}}grpSpPr")
+              if g.getparent() is not slide.shapes._spTree]
+    for g in sorted(groups, key=lambda e: len(list(e.iterancestors()))):
+        fix(g)
+
+
+def ungroup(slide):
+    """After unscale_groups every group draws 1:1, so its children already carry slide
+    coordinates. Lift them out of the group; some viewers (Quick Look) skip grouped shapes."""
+    P = "{http://schemas.openxmlformats.org/presentationml/2006/main}"
+    tree = slide.shapes._spTree
+    while True:
+        groups = [g for g in tree.iter(f"{P}grpSp")]
+        if not groups:
+            return
+        g = groups[0]
+        parent, idx = g.getparent(), g.getparent().index(g)
+        kids = [c for c in g if not c.tag.endswith("}nvGrpSpPr") and not c.tag.endswith("}grpSpPr")]
+        parent.remove(g)
+        for j, c in enumerate(kids):
+            parent.insert(idx + j, c)
+
+
+def normalise_paths(slide):
+    """Canva writes freeform paths in a coordinate box (w, h) larger than the shape itself.
+    That is valid, but some viewers then skip the shape. Rescale each path to the shape's
+    own size; the drawing is identical."""
+    for path in slide.shapes._spTree.iter(f"{A_NS}path"):
+        xfrm = path.getparent().getparent().getparent().find(f"{A_NS}xfrm")
+        if xfrm is None or xfrm.find(f"{A_NS}ext") is None or not path.get("w") or not path.get("h"):
+            continue
+        ext = xfrm.find(f"{A_NS}ext")
+        W, H, pw, ph = int(ext.get("cx")), int(ext.get("cy")), int(path.get("w")), int(path.get("h"))
+        if (pw, ph) == (W, H) or not pw or not ph:
+            continue
+        fx, fy = W / pw, H / ph
+        for pt in path.iter(f"{A_NS}pt"):
+            pt.set("x", str(round(int(pt.get("x")) * fx))); pt.set("y", str(round(int(pt.get("y")) * fy)))
+        for arc in path.iter(f"{A_NS}arcTo"):
+            if arc.get("wR"): arc.set("wR", str(round(int(arc.get("wR")) * fx)))
+            if arc.get("hR"): arc.set("hR", str(round(int(arc.get("hR")) * fy)))
+        path.set("w", str(W)); path.set("h", str(H))
+    # Canva leaves a stock image behind some callouts at 0% opacity; some viewers ignore the
+    # opacity and show it, so replace those fills with no fill (the look in Canva is the same)
+    for blip_fill in list(slide.shapes._spTree.iter(f"{A_NS}blipFill")):
+        amt = blip_fill.xpath("./a:blip/a:alphaModFix/@amt")
+        if amt and int(amt[0]) == 0:
+            blip_fill.addprevious(blip_fill.makeelement(f"{A_NS}noFill", {}))
+            blip_fill.getparent().remove(blip_fill)
+    for xfrm in slide.shapes._spTree.iter(f"{A_NS}xfrm"):  # Canva writes flipH="false"; drop the no-ops
+        for k in ("flipH", "flipV"):
+            if xfrm.get(k) in ("false", "0"):
+                del xfrm.attrib[k]
+
+
 def main(canva, generated, out):
     A, G = Presentation(canva), Presentation(generated)
     a = list(A.slides)
@@ -195,6 +282,11 @@ def main(canva, generated, out):
             A.part.drop_rel(el.rId)
     for sid in order_ids:
         lst.append(ids[sid])
+
+    for sl in order:
+        unscale_groups(sl)
+        ungroup(sl)
+        normalise_paths(sl)
 
     # ---- page numbers follow the final order; none on the title or contributions slide ----
     for k, sl in enumerate(A.slides):
