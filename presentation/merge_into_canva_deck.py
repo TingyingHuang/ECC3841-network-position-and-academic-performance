@@ -1,11 +1,13 @@
 """Puts the final Presentation 3 content into Amy's Canva export, keeping her page design.
 
+The final deck has 15 slides and ends on team contributions, as the project brief requires.
 Her slides that carry over (title, recap, models, Model 2 takeaway, result chart, core
-question, literature, limitations, conclusion, thank-you, references) are edited in place:
-same boxes, fonts and positions, new text. Content she does not have (the replication
-slide, Model 1, the Model 2 and Model 3 games, Model 3 on our data, use 3 and the manager
-decision) is copied in from build_deck.py built at her slide size (P3_SCALE=1.5).
-Her slides 4, 5, 7, 9 and 13 are replaced by those richer versions.
+question, thank-you) are edited in place: same boxes, fonts and positions, new text.
+Content she does not have (Model 1, the Model 2 and Model 3 games, Model 2 on our data,
+use 3 and the manager decision) is copied in from build_deck.py built at her slide size
+(P3_SCALE=1.5). Her other slides (old Model 1/2 setup and evidence, literature,
+limitations, conclusion, references) are dropped: they repeat other slides or are not
+required for Presentation 3.
 
 Usage:
   P3_SCALE=1.5 P3_DECK_OUT=/tmp/deck_x15.pptx python3 presentation/build_deck.py
@@ -144,7 +146,8 @@ def main(canva, generated, out):
     # ---- Model 2 takeaway + use 2 ----------------------------------------------
     s = a[5]
     set_text(s, "TextBox 2", "MODEL 2 · TAKEAWAY, AND USE 2")
-    set_text(s, "TextBox 9", "Similar students keep re-matching, term after term, in every cohort and most of all among freshmen: selection, not influence.")
+    set_text(s, "TextBox 8", "Explains P2's baseline")
+    set_text(s, "TextBox 9", "Contacts' GPA added nothing in P2 because friends are chosen for similar grades: selection, not influence.")
     set_text(s, "TextBox 12", "Explains why position adds little")
     set_text(s, "TextBox 13", "A well-connected student mostly reaches similar-GPA peers, so position mostly mirrors grades the student already has.")
     set_text(s, "TextBox 16", "Use 2: design study groups, early")
@@ -159,50 +162,13 @@ def main(canva, generated, out):
 
     # ---- answering the core question --------------------------------------------
     s = a[9]
-    set_text(s, "TextBox 8", "Does position predict grades?")
-    set_text(s, "TextBox 9", f"Barely: about {100 * R['sd_katz']:.1f}% of a GPA s.d., and in this sparse network Katz reach can't be told apart from friend count.")
-    set_text(s, "TextBox 12", "Why the network looks like this")
-    set_text(s, "TextBox 13", "Students choose friends with similar grades, most of all in first year. The network reflects grades; it doesn't drive them.")
-    set_text(s, "TextBox 16", "What the network is for")
-    set_text(s, "TextBox 17", "Organising study groups a school designs, and spreading habits of middle difficulty through active students.")
-    set_text(s, "TextBox 22", "Course question: network structure explains why friends' grades look alike (selection) and decides who adopts a new habit (thresholds).")
-
-    # ---- limitations ------------------------------------------------------------
-    s = a[10]
-    set_text(s, "TextBox 8", "Prediction, not cause")
-    set_text(s, "TextBox 11", "Students who name more friends may also be more motivated. A stronger test would use random assignment or a natural experiment.")
-    set_text(s, "TextBox 14", "Katz vs friend count")
-    set_text(s, "TextBox 17", f"They correlate at {R['corr_katz_out']:.2f} here, so our network cannot separate them.")
-    set_text(s, "TextBox 20", "Cohorts and simulation")
-    set_text(s, "TextBox 23", "The first-year pattern compares different cohorts; the simulation uses equal thresholds and one snapshot, and its best rule depends on the number of starters.")
-
-    # ---- literature ---------------------------------------------------------------
-    s = a[11]
-    set_text(s, "TextBox 12", "Randomly assigned Dartmouth roommates and peer effects in GPA.\n\nRelevance: random exposure would support a causal reading; our friendships are chosen.")
-    set_text(s, "TextBox 16", "Lecture 7: Katz-Bonacich centrality predicts US students' grades better than degree.\n\nRelevance: our students name far fewer friends, so Katz ≈ friend count here.")
-
-    # ---- conclusion ---------------------------------------------------------------
-    s = a[13]
-    set_text(s, "TextBox 6", "A disciplined empirical result, a model-based explanation for it, and three practical uses.")
-    set_text(s, "TextBox 10", "Does network position shape academic performance? The effort game predicts Katz should matter.")
-    set_text(s, "TextBox 14", "A small, mostly direct-link-driven association; Katz adds nothing beyond direct links.")
-    set_text(s, "TextBox 17", "P3 – USE")
-    set_text(s, "TextBox 18", "Target support by grades; design study groups early; seed habits through active students.")
-
-    # ---- references (appendix) ----------------------------------------------------
-    s = a[14]
-    set_text(s, "TextBox 3", "These sources frame the models and the identification challenge; all results are from our own data and simulations.")
-    set_text(s, "TextBox 6", "Data & peer effects")
-    set_text(s, "TextBox 7", "Smirnov, I., & Thurner, S. (2017). Formation of homophily in academic performance. PLOS ONE, 12(8), e0183473.\n\n"
-                             "Manski, C. F. (1993). Identification of endogenous social effects: the reflection problem. Review of Economic Studies, 60(3), 531–542.\n\n"
-                             "Sacerdote, B. (2001). Peer effects with random assignment. Quarterly Journal of Economics, 116(2), 681–704.")
-    set_text(s, "TextBox 10", "Games on networks")
-    set_text(s, "TextBox 11", "Ballester, C., Calvó-Armengol, A., & Zenou, Y. (2006). Who's who in networks. Econometrica, 74(5), 1403–1417.\n\n"
-                              "Calvó-Armengol, A., Patacchini, E., & Zenou, Y. (2009). Peer effects and social networks in education. Review of Economic Studies, 76(4), 1239–1267.")
-    set_text(s, "TextBox 14", "Contagion")
-    set_text(s, "TextBox 15", "Granovetter, M. (1978). Threshold models of collective behavior. American Journal of Sociology, 83(6), 1420–1443.\n\n"
-                              "Watts, D. J. (2002). A simple model of global cascades on random networks. PNAS, 99(9), 5766–5771.")
-    set_text(s, "TextBox 16", "Appendix: references motivate the theoretical discussion; the results are based on our own network data and simulations.")
+    set_text(s, "TextBox 8", "What structure explains")
+    set_text(s, "TextBox 9", "Why friends' grades look alike: students choose similar friends (Model 2), rather than peers raising effort (Model 1).")
+    set_text(s, "TextBox 12", "What structure decides")
+    set_text(s, "TextBox 13", "Who adopts a new habit: each student waits for enough adopting friends, so who starts and who is isolated matter (Model 3).")
+    set_text(s, "TextBox 16", "What we cannot claim")
+    set_text(s, "TextBox 17", "Causes: these are predictions. And in this sparse network, Katz reach and friend count cannot be separated.")
+    set_text(s, "TextBox 22", "Our answer to P1: position follows grades more than grades follow position.")
 
     # ---- thank you + contributions -----------------------------------------------
     s = a[15]
@@ -210,9 +176,9 @@ def main(canva, generated, out):
     set_text(s, "TextBox 4", "Amy Bing: [contribution]\nTingying Huang: [contribution]")
 
     # ---- insert generated slides, drop the replaced ones, set the order ------------
-    new = {k: copy_in(A, g[k - 1]) for k in (4, 5, 6, 7, 8, 10, 11, 13, 14)}
-    order = [a[0], a[1], a[2], new[4], new[5], new[6], new[7], new[8], a[5], new[10], new[11],
-             a[7], new[13], new[14], a[9], a[11], a[10], a[13], a[15], a[14]]
+    new = {k: copy_in(A, g[k - 1]) for k in (4, 5, 6, 7, 8, 10, 12, 13)}
+    order = [a[0], a[1], a[2], new[4], new[5], new[6], new[7], new[8], a[5], new[10],
+             a[7], new[12], new[13], a[9], a[15]]
     lst = A.slides._sldIdLst
     ids = {sl.slide_id: el for sl, el in zip(A.slides, list(lst))}
     order_ids = [sl.slide_id for sl in order]
@@ -223,12 +189,12 @@ def main(canva, generated, out):
     for sid in order_ids:
         lst.append(ids[sid])
 
-    # ---- page numbers follow the final order; none on title, thank-you, appendix ----
+    # ---- page numbers follow the final order; none on the title or contributions slide ----
     for k, sl in enumerate(A.slides):
         for sh in sl.shapes:
             if sh.has_text_frame and Emu(sh.left).inches > 18 and Emu(sh.top).inches > 10.2 and sh.text_frame.text.strip().isdigit():
                 runs = sh.text_frame.paragraphs[0].runs
-                runs[0].text = str(k) if 0 < k < len(order) - 2 else ""
+                runs[0].text = str(k) if 0 < k < len(order) - 1 else ""
     A.save(out)
     print(out, len(A.slides), "slides")
 
