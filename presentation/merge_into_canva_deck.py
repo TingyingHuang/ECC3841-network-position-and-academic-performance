@@ -158,7 +158,7 @@ def main(canva, generated, out):
     set_text(s, "TextBox 2", "MODEL 3 · RESULT")
     set_text(s, "TextBox 8", "Highest Katz")
     set_text(s, "TextBox 11", "Most active")
-    set_text(s, "TextBox 143", "Share of students who end up adopting (%), starting with 3% of students, 300 simulations per point. Easy habit (r = 1): spreads anyway. Hard habit (r ≥ 4): barely spreads.")
+    set_text(s, "TextBox 143", "Share of students who end up adopting (%), starting with 3% of students, 300 simulations per point. Easy habit (r = 1): spreads anyway. Hard habit (r ≥ 4): barely spreads. Critical mass (Lecture 1).")
 
     # ---- answering the core question --------------------------------------------
     s = a[9]

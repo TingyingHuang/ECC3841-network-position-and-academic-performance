@@ -124,31 +124,26 @@ forest(s, 0.8, 3.25, 11.75, [
     ("In-degree alone (named by others)", R["in_only"].coef, R["in_only"].ci_low, R["in_only"].ci_high, pval(R["in_only"].pval), GREY),
     ("Katz, with in- and out-degree (P2)", R["katz_full"].coef, R["katz_full"].ci_low, R["katz_full"].ci_high, pval(R["katz_full"].pval), ORANGE)],
     -0.01, 0.03, 0.01, row_h=0.42, label_w=4.0, note_w=1.5, cap=False, fs=12)
-stat(s, 0.8, 5.25, 2.85, 1.15, "Katz vs out-degree", f"r = {R['corr_katz_out']:.2f}", "almost the same measure", ORANGE, 20)
-stat(s, 3.8, 5.25, 2.85, 1.15, "Out-degree, with Katz", pval(R["out_full"].pval), "loses significance too", GREY, 20)
-stat(s, 6.8, 5.25, 2.85, 1.15, "All three together", pval(R["joint_p"]), "position as a whole", GREEN, 20)
-stat(s, 9.8, 5.25, 2.75, 1.15, "Any φ tested", f"p ≥ {R['phi_min_p']:.2f}", "Katz beyond degree", GREY, 20)
+stat(s, 0.8, 5.25, 5.75, 1.15, "Katz vs out-degree", f"r = {R['corr_katz_out']:.2f}", "almost the same measure in our network", ORANGE, 20)
+stat(s, 6.8, 5.25, 5.75, 1.15, "Katz and out-degree together", "neither significant",
+     f"Katz {pval(R['katz_full'].pval)}, out-degree {pval(R['out_full'].pval)}", GREY, 20)
 text(s, 0.8, 6.5, 11.7, 0.5, f"Why: students name few friends (median {R['median_out'][0]:.0f} in the high school), so the friends-of-friends terms are tiny. "
      f"Lecture 7's US students named about {L7_FRIENDS} each, leaving room for Katz to differ.", 11, DARK, italic=True, align=PP_ALIGN.CENTER)
 pagenum(s, next(PAGE))
 
 # ================================================================ 5 use 1
-io, ii = R["iso_out"], R["iso_in"]
+ii = R["iso_in"]
 s = new_slide(); header(s, "Use 1 · flag students who need support?", "No: the network adds almost nothing to past grades")
 panel(s, 0.8, 1.8, 5.6, 3.6, "SIZE, IN LECTURE 7'S UNITS (SHARE OF A GPA S.D.)", ORANGE)
-stat(s, 1.05, 2.2, 5.1, 1.15, "Own past GPA, per s.d.", pct(R["sd_own"]), "of a s.d. of next term's GPA", GREEN, 22)
-stat(s, 1.05, 3.45, 2.5, 1.15, "Katz, per s.d.", f"{100 * R['sd_katz']:.1f}%", f"Lecture 7: {L7_KATZ_SD}", ORANGE, 22)
-stat(s, 3.65, 3.45, 2.5, 1.15, "Friend count, per s.d.", f"{100 * R['sd_out']:.1f}%", f"Lecture 7: {L7_DEGREE_SD}", ORANGE, 22)
-text(s, 1.05, 4.7, 5.1, 0.7, f"Same model, same units: our Katz effect is about {round(7 / (100 * R['sd_katz']))} times smaller than the lecture's, and no bigger than friend count.", 11.5, DARK)
-panel(s, 6.6, 1.8, 5.95, 3.6, "NEW CHECK: STUDENTS WITH NO TIES (ALL 655 STUDENTS)", GREEN)
-text(s, 6.85, 2.2, 5.5, 0.3, "Same GPA this term → GPA next term", 10.5, GREY)
-stat(s, 6.85, 2.5, 2.65, 1.3, "Name no one", f"{pct(io.share_of_student_terms)} of terms", f"no difference, {pval(io.pval)}", GREY, 20)
-stat(s, 9.65, 2.5, 2.65, 1.3, "Named by no one", f"{pct(ii.share_of_student_terms)} of terms",
-     f"GPA falls: {pct(ii.fell_share_if_1)} vs {pct(ii.fell_share_if_0)}, {pval(ii.pval)}", ORANGE, 20)
-text(s, 6.85, 3.95, 5.5, 1.3, f"Flagging everyone named by no one would cover {pct(ii.share_of_student_terms)} of students "
-     f"and catch {pct(ii.share_of_all_falls_flagged)} of all GPA falls: barely better than picking at random.", 12, DARK, True)
+stat(s, 1.05, 2.25, 2.5, 1.5, "Katz, our data", f"{100 * R['sd_katz']:.1f}%", "per s.d. of Katz", ORANGE, 30)
+stat(s, 3.65, 2.25, 2.5, 1.5, "Katz, Lecture 7", L7_KATZ_SD, "US schools (AddHealth)", GREY, 30)
+text(s, 1.05, 4.0, 5.1, 1.2, f"Same model, same units: our effect is about {round(7 / (100 * R['sd_katz']))} times smaller.", 13, DARK, True)
+panel(s, 6.6, 1.8, 5.95, 3.6, "NEW CHECK: STUDENTS P2'S MODEL LEFT OUT", GREEN)
+stat(s, 6.85, 2.25, 2.65, 1.5, "Flag 'named by no one'", f"{pct(ii.share_of_student_terms)}", "of students would be flagged", ORANGE, 30)
+stat(s, 9.65, 2.25, 2.65, 1.5, "It would catch", f"{pct(ii.share_of_all_falls_flagged)}", "of all GPA falls", ORANGE, 30)
+text(s, 6.85, 4.0, 5.5, 1.2, "Barely better than picking students at random.", 13, DARK, True)
 callout(s, 5.65, "", "A school should flag students for support by their past grades, not by their place in the friendship network.", 0.85, size=14)
-text(s, 0.8, 6.6, 11.7, 0.4, "P2's model drops students with no contacts (contacts' GPA is undefined); this check keeps them. A GPA fall means more than 0.1 points.",
+text(s, 0.8, 6.6, 11.7, 0.4, "A GPA fall means a drop of more than 0.1 points from one term to the next.",
      10, GREY, italic=True, align=PP_ALIGN.CENTER)
 pagenum(s, next(PAGE))
 
@@ -175,7 +170,7 @@ hs = R["cohorts"].loc["school"]
 s = new_slide(); header(s, "Model 2 · model to data", "New ties join closer-GPA students, most of all in first year")
 panel(s, 0.8, 1.8, 5.2, 3.75, "SMIRNOV & THURNER'S TEST, REPLICATED", GREY)
 stat(s, 1.05, 2.25, 4.75, 1.45, "New vs broken ties, university", f"{R['uni']['diff']:+.3f}",
-     f"GPA gap of new ties is smaller, {pval(R['uni'].p_value)}, {int(R['uni'].n_new_ties + R['uni'].n_dropped_ties):,} ties", GREEN, 26)
+     f"gap {R['uni'].mean_gap_new:.3f} new vs {R['uni'].mean_gap_dropped:.3f} broken, {pval(R['uni'].p_value)}, {int(R['uni'].n_new_ties + R['uni'].n_dropped_ties):,} ties", GREEN, 26)
 stat(s, 1.05, 3.85, 4.75, 1.45, "Same test, high school", f"{hs['diff']:+.3f}", f"same direction, {pval(hs.p_value)} (smaller sample)", GREY, 26)
 panel(s, 6.2, 1.8, 6.35, 3.75, "OUR EXTENSION: HOW MUCH CLOSER NEW TIES ARE, BY YEAR", GREEN)
 bars(s, 6.45, 2.3, 4.7, [(lab, -c.loc[g, "diff"], GREEN if c.loc[g, "p_value"] < 0.05 else GREY, f"{-c.loc[g, 'diff']:.3f}")
@@ -199,20 +194,21 @@ cards3(s, 2.3, 3.4, [
 pagenum(s, next(PAGE))
 
 # ================================================================ 8 model 3: the game
-s = new_slide(); header(s, "Model 3 · setup (Lecture 3, Topic 8)", "Threshold contagion on the real network")
+s = new_slide(); header(s, "Model 3 · setup (Watts 2002; Lecture 3, Topic 8)", "Threshold contagion on the real network")
 panel(s, 0.8, 1.8, 6.6, 4.1, "THE GAME")
-text(s, 1.05, 2.2, 6.1, 0.5, "Players: students.  Action: adopt a study habit (1) or not (0).", 12, DARK)
+text(s, 1.05, 2.2, 6.1, 0.5, "Players: students.  Action: join a study group (1) or not (0).", 12, DARK)
 text(s, 1.05, 2.65, 6.1, 0.5, "adopt  ⇔  b × (friends who adopted) ≥ c  ⇔  at least r = c/b", 14.5, DARK, True, HEAD, align=PP_ALIGN.CENTER)
-text(s, 1.05, 3.2, 6.1, 0.7, "c: cost of the habit; b: benefit per friend who uses it (shared notes, a study partner). Harder habit → larger r.", 11, GREY)
+text(s, 1.05, 3.2, 6.1, 0.7, "c: the time the group takes; b: benefit per friend already in it (shared notes, a study partner). Harder habit → larger r.", 11, GREY)
 text(s, 1.05, 3.95, 6.1, 0.3, "EQUILIBRIUM (Lecture 3 majority game)", 10, ORANGE, True)
-text(s, 1.05, 4.25, 6.1, 1.6, "A coordination game with many equilibria: 'nobody adopts' is one. Starting students (seeds) can tip the network into another.\n"
-     "We count friends, not a share, as in Lecture 1's threshold simulation (thresholds 1 to 5).", 12, DARK)
+text(s, 1.05, 4.25, 6.1, 1.6, "A coordination game with many equilibria: 'nobody joins' is one. Starting students (seeds) can tip the network into another.\n"
+     f"Simulated on the real school ({R['n_nodes'][0]:,}) and freshmen ({R['n_nodes'][1]:,}) networks: seeds are 3% or 8% of students "
+     "(highest Katz, most active, or random), r = 1 to 5, 300 runs each.", 12, DARK)
 panel(s, 7.6, 1.8, 4.95, 4.1, "A SMALL EXAMPLE: r = 2", GREEN)
 toy = {"A": (8.3, 2.7, "A", ORANGE), "B": (8.3, 4.1, "B", ORANGE), "C": (9.6, 3.4, "C", GREEN),
        "D": (10.9, 2.7, "D", GREEN), "E": (12.0, 3.6, "E", GREY), "F": (10.9, 4.8, "F", GREY)}
 network(s, toy, [("A", "C"), ("B", "C"), ("A", "D"), ("C", "D"), ("D", "E")], r=0.27, size=12)
-text(s, 7.85, 5.05, 4.5, 0.8, "Seeds A, B → C adopts (2 friends) → D adopts (A, C).\nE has 1 adopting friend: never. F has none: never.", 10.5, DARK, align=PP_ALIGN.CENTER)
-callout(s, 6.1, "", f"Simulated on our real networks. Who starts, how hard the habit is, and who has no friends ({pct(R['never_school_r1'])} of high-schoolers name no one) decide how far it spreads.", 0.8, size=13)
+text(s, 7.85, 5.05, 4.5, 0.8, "Seeds A, B → C joins (2 friends) → D joins (A, C).\nE has 1 friend in the group: never. F has none: never.", 10.5, DARK, align=PP_ALIGN.CENTER)
+callout(s, 6.1, "", f"Who starts, how hard the habit is, and who has no friends ({pct(R['never_school_r1'])} of high-schoolers name no one) decide how far it spreads.", 0.8, size=13)
 pagenum(s, next(PAGE))
 
 # ================================================================ 10 model 3: result
@@ -222,7 +218,7 @@ for x, g, title in [(0.8, "school", f"High school (N = {R['n_nodes'][0]:,})"), (
     line_chart(s, x, 2.15, 5.5, 4.1, [("Katz", R["curve"](g, "top_katz"), ORANGE), ("Active", R["curve"](g, "top_out_degree"), GREEN),
                                       ("Random", R["curve"](g, "random"), GREY)],
                [1, 2, 3, 4, 5], title=title, xlab="r = friends needed before a student adopts")
-text(s, 0.8, 6.35, 11.7, 0.5, "Share of students who end up adopting (%), starting with 3% of students, 300 simulations per point. Easy habit (r = 1): spreads anyway. Hard habit (r ≥ 4): barely spreads.",
+text(s, 0.8, 6.35, 11.7, 0.5, "Share of students who end up adopting (%), starting with 3% of students, 300 simulations per point. Easy habit (r = 1): spreads anyway. Hard habit (r ≥ 4): barely spreads. Critical mass (Lecture 1).",
      10, GREY, italic=True, align=PP_ALIGN.CENTER)
 pagenum(s, next(PAGE))
 
