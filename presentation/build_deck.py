@@ -1,5 +1,8 @@
 """Builds P3/ECC3841 Presentation 3.pptx.
 
+Built on Amy's Canva revision of the deck (P3/old.pptx.pdf): her slide titles, recap,
+literature, conclusion and references are kept; content is corrected to the final logic chain.
+
 Story: P1 asked whether network position predicts grades; P2 found it barely does.
 P3 asks what a school can still use its friendship network for, with one course model
 per use, each told the way the lectures apply a model: players, actions and payoffs,
@@ -21,6 +24,7 @@ from p3_results import L7_DEGREE_SD, L7_FRIENDS, L7_KATZ_SD, load_results, pct, 
 
 
 R = load_results()
+PAGE = iter(range(1, 100))
 
 
 def cards3(s, y, h, items, title_h=0.85, size=12):
@@ -64,23 +68,26 @@ network(s, art, [(0, 1), (1, 2), (0, 3), (1, 4), (3, 4), (4, 2), (2, 5), (3, 6),
                  (5, 8), (8, 9), (6, 10), (7, 10), (7, 11), (8, 11), (10, 11)], r=0.22)
 pagenum(s, "")
 
-# ================================================================ 1 where we are
-s = new_slide(); header(s, "Where we are", "From question, to evidence, to use")
-for i, (kick, t, d, col) in enumerate([
-        ("PRESENTATION 1 · QUESTION", "Does network position predict grades, beyond direct friends?",
-         "Model: the peer-effort game. Students study harder when friends do, so effort follows Katz-Bonacich centrality.\n\nPrediction: Katz matters; counting friends adds nothing.", GREY),
-        ("PRESENTATION 2 · EVIDENCE", "The prediction did not hold",
-         f"Own past GPA predicts later GPA (β = {R['own_gpa']:.3f}); contacts' GPA does not ({pval(R['contact_p'])}).\n\n"
-         f"Katz beyond direct links: {R['katz_full'].coef:+.3f}, {pval(R['katz_full'].pval)}.", GREEN),
-        ("PRESENTATION 3 · TODAY", "So what can a school use the network for?",
-         "One course model per use:\n1. Flag students who need support?\n   (effort game & Katz)\n2. Organise study groups?\n   (network formation)\n3. Spread a study habit?\n   (threshold contagion)", ORANGE)]):
-    x = 0.8 + i * 4.1
-    box(s, x, 1.85, 3.8, 4.35, WHITE, LINE, adj=0.07)
-    text(s, x + 0.25, 2.0, 3.3, 0.3, kick, 9.5, col, True)
-    text(s, x + 0.25, 2.35, 3.3, 1.0, t, 15.5, DARK, True, HEAD)
-    text(s, x + 0.25, 3.4, 3.3, 2.7, d, 12, DARK)
-callout(s, 6.35, "", "Each model: the incentive, a small example, how it maps onto our data, the result, and what a school should do.", 0.7, size=13.5)
-pagenum(s, 1)
+# ================================================================ recap (Amy's slide, P2's own numbers)
+s = new_slide(); header(s, "Where we left off", "Recap of presentation 2")
+stat(s, 0.8, 1.9, 2.75, 1.9, "Baseline", f"{R['own_gpa']:.3f}", "own past GPA, p < 0.001", GREEN, 30)
+stat(s, 3.7, 1.9, 2.75, 1.9, "Contacts' past GPA", pval(R["contact_p"]), "no effect on later GPA", GREY, 26)
+stat(s, 6.6, 1.9, 2.75, 1.9, "Pooled Katz", f"{R['pooled_katz']:+.3f}", f"→ {R['pooled_katz_ctrl']:+.3f} once direct links counted", ORANGE, 30)
+stat(s, 9.5, 1.9, 3.05, 1.9, "School panel, Katz", f"{R['katz_full'].coef:+.3f}", f"beyond direct links, {pval(R['katz_full'].pval)}", ORANGE, 30)
+callout(s, 4.1, "", "P1's prediction, that Katz reach matters beyond direct friends, did not hold.", 0.9, size=14.5)
+text(s, 0.8, 5.35, 11.7, 0.7, "So today's question: if position barely predicts grades, what can a school still use its students' friendship network for?",
+     14, GREY, italic=True, align=PP_ALIGN.CENTER)
+pagenum(s, next(PAGE))
+
+# ================================================================ plan (Amy's 'different models' slide, now three)
+s = new_slide(); header(s, "Today", "Three course models, three possible uses", two_line=False)
+cards3(s, 1.95, 3.85, [
+    ("Model 1 · Effort game & Katz", "Lectures 1, 3, 7.\n\nUse 1: can the network flag students who need support?", ORANGE),
+    ("Model 2 · Network formation", "Pairwise stability (Topic 2), homophily and Schelling (Topic 8).\n\nUse 2: how should a school organise study groups?", GREEN),
+    ("Model 3 · Threshold contagion", "Majority game (Lecture 3), complex contagion (Topic 8).\n\nUse 3: who should start a study-habit campaign?", ORANGE)],
+    title_h=0.6, size=12.5)
+callout(s, 6.05, "", "Each model: the incentive, a small example, how it maps onto our data, the result, and what a school should do.", 0.8, size=13.5)
+pagenum(s, next(PAGE))
 
 # ================================================================ 2 confirmed (replication)
 c = R["cohorts"]
@@ -100,7 +107,7 @@ for i, g in enumerate(["freshmen", "sophomores", "juniors", "seniors"]):
 text(s, 6.45, 4.85, 5.9, 0.6, f"Freshmen sort {R['ratio_lo']} to {R['ratio_hi']} times more than older students, while friendships are still forming.",
      11.5, DARK, True)
 callout(s, 5.8, "", "Students choose friends like themselves; friends don't change each other's grades. We take this as given and ask what the network is still good for.", 0.95, size=13.5)
-pagenum(s, 2)
+pagenum(s, next(PAGE))
 
 # ================================================================ 3 model 1: the game
 s = new_slide(); header(s, "Model 1 · effort game and Katz (Lectures 1, 3, 7)", "Why reach should matter, in theory")
@@ -124,7 +131,7 @@ text(s, 10.75, 2.75, 1.75, 0.7, f"Katz A\n= {katz[0]:.2f}", 13, ORANGE, True, HE
 text(s, 10.75, 4.4, 1.75, 0.7, f"Katz B\n= {katz[7]:.2f}", 13, ORANGE, True, HEAD)
 text(s, 7.85, 5.35, 4.5, 0.5, "Both name 2 friends. A's friends name others, B's don't.", 11, GREY, italic=True)
 callout(s, 6.1, "", "P1's prediction: reach beyond direct friends (the φ² terms and beyond) raises effort, so it should raise grades.", 0.8, size=13.5)
-pagenum(s, 3)
+pagenum(s, next(PAGE))
 
 # ================================================================ 4 model 1: our data and result
 s = new_slide(); header(s, "Model 1 · model to data", "In our network, Katz and friend count are the same thing")
@@ -142,7 +149,7 @@ stat(s, 6.8, 5.25, 2.85, 1.15, "All three together", pval(R["joint_p"]), "positi
 stat(s, 9.8, 5.25, 2.75, 1.15, "Any φ tested", f"p ≥ {R['phi_min_p']:.2f}", "Katz beyond degree", GREY, 20)
 text(s, 0.8, 6.5, 11.7, 0.5, f"Why: students name few friends (median {R['median_out'][0]:.0f} in the high school), so the friends-of-friends terms are tiny. "
      f"Lecture 7's US students named about {L7_FRIENDS} each, leaving room for Katz to differ.", 11, DARK, italic=True, align=PP_ALIGN.CENTER)
-pagenum(s, 4)
+pagenum(s, next(PAGE))
 
 # ================================================================ 5 use 1
 io, ii = R["iso_out"], R["iso_in"]
@@ -162,10 +169,10 @@ text(s, 6.85, 3.95, 5.5, 1.3, f"Flagging everyone named by no one would cover {p
 callout(s, 5.65, "", "A school should flag students for support by their past grades, not by their place in the friendship network.", 0.85, size=14)
 text(s, 0.8, 6.6, 11.7, 0.4, "P2's model drops students with no contacts (contacts' GPA is undefined); this check keeps them. A GPA fall means more than 0.1 points.",
      10, GREY, italic=True, align=PP_ALIGN.CENTER)
-pagenum(s, 5)
+pagenum(s, next(PAGE))
 
 # ================================================================ 6 model 2: the game
-s = new_slide(); header(s, "Model 2 · network formation (Topic 2, Topic 8)", "Friendships last when both sides gain")
+s = new_slide(); header(s, "Model 2 · network formation (Topic 2, Topic 8)", "A simple incentive to link with similar peers")
 panel(s, 0.8, 1.8, 6.6, 4.1, "THE GAME")
 text(s, 1.05, 2.2, 6.1, 0.5, "Players: students.  Action: which friendships to keep.  Type: GPA.", 12, DARK)
 text(s, 1.05, 2.65, 6.1, 0.5, "u_i(g) = Σ_{j: ij ∈ g} [ b(|GPA_i − GPA_j|) − c ]", 16, DARK, True, HEAD, align=PP_ALIGN.CENTER)
@@ -179,25 +186,22 @@ network(s, toy, [(0, 1, GREEN), (2, 3, GREEN), (1, 2, NODE, True), (0, 3, NODE, 
 text(s, 7.85, 2.25, 4.5, 0.35, "Same-level pairs: gap 0.1, b = 0.9 ≥ 0.5, kept", 10.5, GREEN, True, align=PP_ALIGN.CENTER)
 text(s, 7.85, 5.05, 4.5, 0.8, "Dashed: gap 0.8–1.0, b ≤ 0.2 < 0.5, dropped.\nStable network: two same-level pairs.", 11, GREY, italic=True, align=PP_ALIGN.CENTER)
 callout(s, 6.1, "", "Prediction: ties that form should join closer-GPA students than ties that break.", 0.8, size=14)
-pagenum(s, 6)
+pagenum(s, next(PAGE))
 
-# ================================================================ 7 model 2: data and use 2
-s = new_slide(); header(s, "Model 2 · model to data, and Use 2", "Study groups have to be designed, and early")
-mapping(s, 1.65, [("A tie exists only where b(gap) ≥ c for both", "Compare GPA gaps of ties formed vs ties broken between snapshots"),
-                  ("Prediction: new ties have smaller gaps", f"Confirmed in every cohort; freshmen {R['ratio_lo']}–{R['ratio_hi']}× older years (slide 2)")], h=0.5)
-panel(s, 0.8, 3.25, 11.75, 2.45, "USE 2 · ORGANISE STUDY GROUPS?", GREEN)
-for i, (t, d) in enumerate([
-        ("Mixing won't happen by itself", "Students keep re-sorting by grades, so mixed-ability contact has to be built into the program."),
-        ("Do it in first year", "That is when sorting is strongest and friendships are still forming."),
-        ("Course evidence that it works", "Lecture 7, Bangladesh RCT: study groups raised low-ability girls' scores; friendship groups worked best. Advice: let students group by friendship, with a constraint on each group's average score.")]):
-    x = 1.05 + i * 3.85
-    text(s, x, 3.65, 3.6, 0.4, t, 13.5, DARK, True, HEAD)
-    text(s, x, 4.1, 3.6, 1.5, d, 11.5, DARK)
+# ================================================================ model 2 takeaway + use 2 (Amy's slide)
+s = new_slide(); header(s, "Model 2 · takeaway, and use 2", "This is why “selection” keeps winning")
+text(s, 0.8, 1.75, 11.7, 0.4, f"Model to data: ties form and break by GPA gap, as pairwise stability predicts. Confirmed in every cohort, freshmen {R['ratio_lo']}–{R['ratio_hi']}× older years.",
+     11.5, GREY)
+cards3(s, 2.3, 3.4, [
+    ("Explains the baseline", "Smirnov & Thurner's result holds because similar students keep re-matching with each other, term after term: selection, not influence.", GREEN),
+    ("Explains why position adds little", "A well-connected student mostly reaches similar-GPA peers, so position mostly mirrors grades the student already has.", ORANGE),
+    ("Use 2: design study groups, early", "Mixing won't happen by itself. Form mixed-ability groups in first year. Lecture 7 (Bangladesh RCT): friendship groups with a cap on the group's average score raised scores.", GREEN)],
+    size=12)
 callout(s, 5.95, "", "Use the network to form groups (friends together, mixed in ability), not to wait for mixing to happen.", 0.85, size=14)
-pagenum(s, 7)
+pagenum(s, next(PAGE))
 
 # ================================================================ 8 model 3: the game
-s = new_slide(); header(s, "Model 3 · threshold contagion (Lecture 3, Topic 8)", "A habit spreads only when enough friends have it")
+s = new_slide(); header(s, "Model 3 · setup (Lecture 3, Topic 8)", "Threshold contagion on the real network")
 panel(s, 0.8, 1.8, 6.6, 4.1, "THE GAME")
 text(s, 1.05, 2.2, 6.1, 0.5, "Players: students.  Action: adopt a study habit (1) or not (0).", 12, DARK)
 text(s, 1.05, 2.65, 6.1, 0.5, "adopt  ⇔  b × (friends who adopted) ≥ c  ⇔  at least r = c/b", 14.5, DARK, True, HEAD, align=PP_ALIGN.CENTER)
@@ -211,10 +215,10 @@ toy = {"A": (8.3, 2.7, "A", ORANGE), "B": (8.3, 4.1, "B", ORANGE), "C": (9.6, 3.
 network(s, toy, [("A", "C"), ("B", "C"), ("A", "D"), ("C", "D"), ("D", "E")], r=0.27, size=12)
 text(s, 7.85, 5.05, 4.5, 0.8, "Seeds A, B → C adopts (2 friends) → D adopts (A, C).\nE has 1 adopting friend: never. F has none: never.", 10.5, DARK, align=PP_ALIGN.CENTER)
 callout(s, 6.1, "", "Who starts, how hard the habit is, and who has no friends at all decide how far it spreads.", 0.8, size=14)
-pagenum(s, 8)
+pagenum(s, next(PAGE))
 
 # ================================================================ 9 model 3: data
-s = new_slide(); header(s, "Model 3 · model to data", "Simulated on the real networks")
+s = new_slide(); header(s, "Model 3 · model to data", "Why r matters: many students name few friends")
 mapping(s, 1.65, [("Network g", f"Who likes whom: high school ({R['n_nodes'][0]:,} students), freshmen ({R['n_nodes'][1]:,})"),
                   ("A student counts friends who adopted", "Counts the classmates they named (outgoing ties)"),
                   ("Seeds", "3% or 8% of students: the most active (out-degree), highest Katz, or random"),
@@ -223,10 +227,10 @@ text(s, 0.8, 4.1, 11.7, 0.3, "A WARNING FROM THE DATA: MANY STUDENTS NAME FEW OR
 stat(s, 0.8, 4.45, 3.7, 1.6, "High school", pct(R["never_school_r1"]), "name no one in the simulated snapshot: unreachable", ORANGE, 30)
 stat(s, 4.75, 4.45, 3.7, 1.6, "Typical student", f"{R['median_out'][0]:.0f} / {R['median_out'][1]:.0f}", "friends named: high school / freshmen", DARK, 30)
 stat(s, 8.7, 4.45, 3.85, 1.6, "If r = 4", f"{pct(R['never_r4'][0])} / {pct(R['never_r4'][1])}", "can never adopt via friends (school / freshmen)", ORANGE, 30)
-pagenum(s, 9)
+pagenum(s, next(PAGE))
 
 # ================================================================ 10 model 3: result
-s = new_slide(); header(s, "Model 3 · result", "Who starts matters only for habits of middle difficulty")
+s = new_slide(); header(s, "Model 3 · result", "A critical window where seeding strategy matters")
 legend(s, 0.8, 1.72, [("Highest Katz", ORANGE), ("Most active", GREEN), ("Random", GREY)])
 for x, g, title in [(0.8, "school", f"High school (N = {R['n_nodes'][0]:,})"), (7.0, "freshmen", f"Freshmen (N = {R['n_nodes'][1]:,})")]:
     line_chart(s, x, 2.15, 5.5, 4.1, [("Katz", R["curve"](g, "top_katz"), ORANGE), ("Active", R["curve"](g, "top_out_degree"), GREEN),
@@ -234,11 +238,11 @@ for x, g, title in [(0.8, "school", f"High school (N = {R['n_nodes'][0]:,})"), (
                [1, 2, 3, 4, 5], title=title, xlab="r = friends needed before a student adopts")
 text(s, 0.8, 6.35, 11.7, 0.5, "Share of students who end up adopting (%), starting with 3% of students, 300 simulations per point. Easy habit (r = 1): spreads anyway. Hard habit (r ≥ 4): barely spreads.",
      10, GREY, italic=True, align=PP_ALIGN.CENTER)
-pagenum(s, 10)
+pagenum(s, next(PAGE))
 
 # ================================================================ 11 use 3
 h3, h8 = R["hc"]("freshmen", 0.03, 3), R["hc"]("freshmen", 0.08, 3)
-s = new_slide(); header(s, "Use 3 · spread a study habit?", "Yes, if you start with the right students")
+s = new_slide(); header(s, "Model 3 · takeaway, and use 3", "Out-degree beats Katz for seeding too")
 text(s, 0.8, 1.75, 11.5, 0.3, "Share who adopt at r = 3, freshmen network", 11.5, GREY)
 for x, h, kick, col in [(0.8, h3, f"FEW STARTERS · {int(h3.k_seed)} students (3%)", GREEN), (7.0, h8, f"MORE STARTERS · {int(h8.k_seed)} students (8%)", ORANGE)]:
     text(s, x, 2.15, 5.6, 0.35, kick, 10.5, col, True)
@@ -250,7 +254,7 @@ stat(s, 0.8, 4.45, 3.7, 1.25, "Most active vs random", f"+{h3.extra_vs_random_to
 stat(s, 4.75, 4.45, 3.7, 1.25, "Most active vs highest Katz", f"+{h3.extra_top_out_degree_vs_top_katz:.0f}", "Katz and friend count finally differ", ORANGE, 24)
 stat(s, 8.7, 4.45, 3.85, 1.25, "With 8% starters", f"random {100 * h8.random:.0f}%", "top students reach the same people", GREY, 24)
 callout(s, 5.95, "", "Few starters: recruit the students who name the most friends. More starters: spread them across groups. Reach students with no friends directly.", 0.95, size=13.5)
-pagenum(s, 11)
+pagenum(s, next(PAGE))
 
 # ================================================================ 12 decision
 s = new_slide(); header(s, "The manager decision", "Which peer-support idea is worth testing?")
@@ -268,30 +272,57 @@ for r_, row in enumerate(rows):
         text(s, x + 0.2, y, w - 0.3, h, row[c_], 10.5 if r_ == 0 else (13 if c_ != 1 else 11.5), col,
              r_ == 0 or c_ != 1, HEAD if (r_ and c_ != 1) else BODY, anchor=MSO_ANCHOR.MIDDLE)
 callout(s, 6.15, "", "Use the network to organise study and spread habits through direct ties. Use grades, not position, to target support.", 0.75, size=13.5)
-pagenum(s, 12)
+pagenum(s, next(PAGE))
 
-# ================================================================ 13 answer
-s = new_slide(); header(s, "Answering our P1 question", "Grades shape the network more than the network shapes grades", two_line=True)
-cards3(s, 2.3, 3.3, [
+# ================================================================ answer (Amy's 'Bringing it together')
+s = new_slide(); header(s, "Bringing it together", "Answering the core question")
+cards3(s, 1.95, 3.6, [
     ("Does position predict grades?", f"Barely: about {100 * R['sd_katz']:.1f}% of a GPA s.d., and in this sparse network Katz reach can't be told apart from friend count.", ORANGE),
-    ("Why not?", "Students choose friends with similar grades, most of all in first year. The network reflects grades; it doesn't drive them.", GREEN),
-    ("What is the network for?", "Organising study groups a school designs, and spreading habits of middle difficulty through active students.", ORANGE)],
+    ("Why the network looks like this", "Students choose friends with similar grades, most of all in first year. The network reflects grades; it doesn't drive them.", GREEN),
+    ("What the network is for", "Organising study groups a school designs, and spreading habits of middle difficulty through active students.", ORANGE)],
     size=13)
-callout(s, 5.85, "", "Course question: network structure explains why friends' grades look alike (selection) and decides who adopts a new habit (thresholds).", 0.9, size=13.5)
-pagenum(s, 13)
+callout(s, 5.8, "", "Course question: network structure explains why friends' grades look alike (selection) and decides who adopts a new habit (thresholds).", 0.9, size=13.5)
+pagenum(s, next(PAGE))
+
+# ================================================================ literature (Amy's slide)
+s = new_slide(); header(s, "Existing literature", "What the existing literature adds")
+text(s, 0.8, 1.75, 11.7, 0.35, "These studies motivate the mechanisms and clarify the identification challenge.", 12, GREY)
+cards3(s, 2.25, 3.5, [
+    ("Manski (1993)", "Reflection problem: peer influence is hard to separate from shared characteristics and simultaneous behaviour.\n\nRelevance: similar GPA among friends does not prove influence.", DARK),
+    ("Sacerdote (2001)", "Randomly assigned Dartmouth roommates and peer effects in GPA.\n\nRelevance: random exposure would strengthen a causal reading; our friendships are chosen.", DARK),
+    ("Calvó-Armengol et al. (2009)", f"Lecture 7: Katz-Bonacich centrality predicts US students' grades better than degree.\n\nRelevance: our students name far fewer friends, so Katz ≈ friend count here.", DARK)],
+    title_h=0.55, size=12)
+text(s, 0.8, 6.0, 11.7, 0.6, "Different settings and research designs can produce different estimates; the literature motivates our interpretation but does not prove our mechanism.",
+     12, DARK, True, align=PP_ALIGN.CENTER)
+pagenum(s, next(PAGE))
 
 # ================================================================ 14 limitations
-s = new_slide(); header(s, "Limitations", "What we cannot claim")
+s = new_slide(); header(s, "Limitations", "What these models do not establish")
 for i, (t, d) in enumerate([
         ("Prediction, not cause", "Students who name more friends may also be more motivated. We show what predicts grades, not what causes them."),
         ("Katz vs friend count", f"They are highly correlated here (r = {R['corr_katz_out']:.2f}), so our network cannot separate them."),
         ("Cohorts, not the same students", "The first-year pattern compares different cohorts; one cohort followed for four years would be cleaner."),
         ("Simulation is a sketch", "Equal thresholds, one snapshot, and the best starting rule depends on how many starters there are.")]):
-    y = 1.9 + i * 1.18
-    box(s, 0.8, y, 11.75, 1.0, WHITE, LINE, adj=0.14)
-    text(s, 1.1, y + 0.1, 3.5, 0.8, t, 13.5, ORANGE, True, HEAD, anchor=MSO_ANCHOR.MIDDLE)
-    text(s, 4.8, y, 7.55, 1.0, d, 12, DARK, anchor=MSO_ANCHOR.MIDDLE)
-pagenum(s, 14)
+    y = 1.8 + i * 1.02
+    box(s, 0.8, y, 11.75, 0.88, WHITE, LINE, adj=0.14)
+    text(s, 1.1, y, 3.5, 0.88, t, 13.5, ORANGE, True, HEAD, anchor=MSO_ANCHOR.MIDDLE)
+    text(s, 4.8, y, 7.55, 0.88, d, 12, DARK, anchor=MSO_ANCHOR.MIDDLE)
+callout(s, 5.95, "A stronger next test", "Time-varying controls, school-by-time effects, and random assignment or a natural experiment.", 0.8, size=13)
+pagenum(s, next(PAGE))
+
+# ================================================================ conclusion (Amy's slide)
+s = new_slide(); header(s, "Conclusion", "What this project contributes")
+text(s, 0.8, 1.85, 11.7, 0.55, "A disciplined empirical result, a model-based explanation for it, and three practical uses.", 15.5, DARK, True)
+for i, (t, d, col) in enumerate([
+        ("P1 – Question", "Does network position shape academic performance? The effort game predicts Katz should matter.", GREY),
+        ("P2 – Evidence", "A small, mostly direct-link-driven association; Katz adds nothing beyond direct links.", GREEN),
+        ("P3 – Use", "Target support by grades; design study groups early; seed habits through active students.", ORANGE)]):
+    x = 0.8 + i * 4.1
+    box(s, x, 2.55, 3.8, 2.75, WHITE, LINE, adj=0.09)
+    text(s, x + 0.25, 2.75, 3.3, 0.4, t.upper(), 10.5, col, True)
+    text(s, x + 0.25, 3.2, 3.3, 2.0, d, 12.5, DARK)
+callout(s, 5.6, "", "A more complete, and more honest, answer than either the regression or the theory alone.", 0.9, size=15)
+pagenum(s, next(PAGE))
 
 # ================================================================ thank you + contributions
 s = new_slide()
@@ -302,6 +333,15 @@ for i, name in enumerate(["Amy Bing", "Tingying Huang"]):
     box(s, x, 2.6, 5.75, 3.6, WHITE, LINE, adj=0.07)
     text(s, x + 0.3, 2.8, 5.15, 0.5, name, 18, DARK, True, HEAD)
     text(s, x + 0.3, 3.45, 5.15, 2.6, "• [contribution]\n• [contribution]\n• [contribution]", 13, GREY)
+
+# ================================================================ references (Amy's slide, appendix)
+s = new_slide(); header(s, "Appendix", "References")
+text(s, 0.8, 1.75, 11.7, 0.35, "These sources frame the models and the identification challenge; all results are from our own data and simulations.", 12, GREY)
+cards3(s, 2.25, 4.2, [
+    ("Data & peer effects", "Smirnov, I., & Thurner, S. (2017). Formation of homophily in academic performance. PLOS ONE, 12(8), e0183473.\n\nManski, C. F. (1993). Identification of endogenous social effects: the reflection problem. Review of Economic Studies, 60(3), 531–542.\n\nSacerdote, B. (2001). Peer effects with random assignment. Quarterly Journal of Economics, 116(2), 681–704.", DARK),
+    ("Games on networks", "Ballester, C., Calvó-Armengol, A., & Zenou, Y. (2006). Who's who in networks. Econometrica, 74(5), 1403–1417.\n\nCalvó-Armengol, A., Patacchini, E., & Zenou, Y. (2009). Peer effects and social networks in education. Review of Economic Studies, 76(4), 1239–1267.", DARK),
+    ("Contagion", "Granovetter, M. (1978). Threshold models of collective behavior. American Journal of Sociology, 83(6), 1420–1443.\n\nWatts, D. J. (2002). A simple model of global cascades on random networks. PNAS, 99(9), 5766–5771.", DARK)],
+    title_h=0.5, size=10.5)
 
 out = P3 / "ECC3841 Presentation 3.pptx"
 prs.save(out)

@@ -17,6 +17,13 @@ def load_results():
     r["own_gpa"] = float(re.search(r"^gpa_lag\s+([-\d.]+)", txt, re.M).group(1))
     r["contact_p"] = float(re.search(r"^avg_friend_gpa_lag\s+(?:[-\d.]+\s+){3}([-\d.]+)", txt, re.M).group(1))
 
+    # Presentation 2's pooled result: Katz alone, then with degree and other centralities
+    l2 = (OUT / "layer2_pooled_regression.txt").read_text()
+    r["pooled_katz"] = float(re.search(r"^katz_z\s+([-\d.]+)", l2, re.M).group(1))
+    hr = (OUT / "robustness_full_horse_race.txt").read_text()
+    m = re.search(r"^katz_centrality_z\s+([-\d.]+)\s+[-\d.]+\s+[-\d.]+\s+([-\d.]+)", hr, re.M)
+    r["pooled_katz_ctrl"], r["pooled_katz_ctrl_p"] = float(m.group(1)), float(m.group(2))
+
     bp = pd.read_csv(OUT / "school_broad_position.csv")
     get = lambda spec, term: bp[(bp.specification == spec) & (bp.term == term)].iloc[0]
     r["katz_only"] = get("Katz only", "katz_t_z")
