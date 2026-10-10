@@ -1,4 +1,5 @@
-"""Presentation 3, model 2: threshold contagion on the real friendship networks.
+"""Presentation 3, model 3: threshold contagion on the real friendship networks
+(course: Lecture 3 majority game, Topic 8 complex contagion).
 
 This is a simulation exercise, not an empirical test on GPA. It asks a different
 question from scripts 01-07: if some costly behaviour (e.g. extra study effort,
