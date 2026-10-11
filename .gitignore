@@ -9,7 +9,6 @@ __pycache__/
 
 # Reproducible inputs and generated artefacts: download or regenerate locally.
 data/
-output/
 slides/
 tmp/
 P3/

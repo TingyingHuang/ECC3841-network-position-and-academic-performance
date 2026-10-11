@@ -1,0 +1,7 @@
+sample,design,n,chi2,joint_pval
+"School panel: popularity, activity and reach",position(t) -> GPA(t+1),2088,13.976151232553455,0.002937795405284258
+School panel: direct links (in- and out-degree),position(t) -> GPA(t+1),2088,0.4210717181624056,0.8101500033977078
+School panel: reach beyond direct links (Katz),position(t) -> GPA(t+1),2088,2.190305300622848,0.13888178496120343
+"Pooled, five cohorts",same period,36696,105.43635613291376,1.0526485247258608e-22
+University cohorts,same period,34164,100.85726022226578,1.0166269149204713e-21
+"High school, same period",same period,2532,10.925870002550422,0.012133552850209502

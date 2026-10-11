@@ -2,7 +2,7 @@
 
 Reproducible analysis for the ECC3841 Network Economics project. The project asks whether a student's position in a directed friendship network predicts later GPA (Presentations 1 and 2), and, since it barely does, what a school can still use its students' friendship network for (Presentation 3).
 
-The repository intentionally contains only code and reproduction instructions. Raw data, generated results, slides, PDFs, and other presentation materials are excluded from version control; the code that builds the Presentation 3 slides is included under `presentation/`.
+The repository contains the code, the generated results in `output/friendship_gpa/`, and reproduction instructions. Raw data, slides, PDFs and other presentation materials are excluded from version control; the code that builds the Presentation 3 slides is included under `presentation/`.
 
 ## Data source
 
@@ -31,7 +31,7 @@ python3 scripts/friendship_gpa/08_threshold_contagion_simulation.py
 python3 scripts/friendship_gpa/09_isolation_and_practical_magnitudes.py
 ```
 
-The commands create `data/friendship_gpa/data.mat` and `output/friendship_gpa/` locally. Both paths are ignored by Git. Run the scripts in this order: later scripts read earlier outputs.
+The commands create `data/friendship_gpa/data.mat` (ignored by Git) and regenerate the results in `output/friendship_gpa/`, which are committed so they can be read without running the code. Run the scripts in this order: later scripts read earlier outputs.
 
 `04_final_synthesis.py` is optional. It produces exploratory cross-sectional diagnostics and is not used in the presentations.
 
