@@ -189,7 +189,7 @@ s = new_slide(); header(s, "Model 2 · takeaway, and use 2", "This is why “sel
 cards3(s, 2.3, 3.4, [
     ("Explains P2's baseline", "Contacts' GPA added nothing in P2 because friends are chosen for similar grades: selection, not influence.", GREEN),
     ("Explains why position adds little", "A well-connected student mostly reaches similar-GPA peers, so position mostly mirrors grades the student already has.", ORANGE),
-    ("Use 2: design study groups, early", "Mixing won't happen by itself. Form mixed-ability groups in first year. Lecture 7 (Bangladesh RCT): friendship groups with a cap on the group's average score raised scores.", GREEN)],
+    ("Use 2: design study groups, early", "Mixing won't happen by itself. Form mixed-ability groups in first year. Lecture 7 (Bangladesh RCT): ability-balanced groups raised scores, friendship groups most. Advice: let friends group, but cap each group's average score.", GREEN)],
     size=12)
 pagenum(s, next(PAGE))
 

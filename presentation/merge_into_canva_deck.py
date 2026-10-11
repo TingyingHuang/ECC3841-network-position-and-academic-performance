@@ -252,7 +252,7 @@ def main(canva, generated, out):
     set_text(s, "TextBox 12", "Explains why position adds little")
     set_text(s, "TextBox 13", "A well-connected student mostly reaches similar-GPA peers, so position mostly mirrors grades the student already has.")
     set_text(s, "TextBox 16", "Use 2: design study groups, early")
-    set_text(s, "TextBox 17", "Mixing won't happen by itself. Form mixed-ability groups in first year. Lecture 7 (Bangladesh RCT): friendship groups with a cap on the group's average score raised scores.")
+    set_text(s, "TextBox 17", "Mixing won't happen by itself. Form mixed-ability groups in first year. Lecture 7 (Bangladesh RCT): ability-balanced groups raised scores, friendship groups most. Advice: let friends group, but cap each group's average score.")
 
     # ---- answering the core question --------------------------------------------
     s = a[9]
